@@ -1,3 +1,10 @@
+# Local Relay Report: TASK-005-evidence-store-and-finding-model
+
+Updated: 2026-04-26T15:42:37.511973+00:00
+
+## State
+
+```json
 {
   "task_id": "TASK-005-evidence-store-and-finding-model",
   "branch": "feat/TASK-005-evidence-store-and-finding-model",
@@ -10,3 +17,8 @@
   "next_actor": "done",
   "blocked": false
 }
+```
+
+## Events
+
+- Gemini verdict: `PASS`.
