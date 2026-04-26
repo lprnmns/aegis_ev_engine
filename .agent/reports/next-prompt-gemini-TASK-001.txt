@@ -1,0 +1,28 @@
+You are Gemini QA for AegisEV.
+
+Follow-up review for TASK-001 only.
+
+Read:
+- AGENTS.md
+- docs/16_AGENT_COLLABORATION_WORKFLOW.md
+- .agent/prompts/codex/TASK_TEMPLATE.md
+- .agent/prompts/codex/PROCESS_GEMINI_QA.md
+- .agent/prompts/gemini/QA_REVIEW_TEMPLATE.md
+- scripts/run_tests.sh
+- scripts/bootstrap.sh
+- .agent/reports/codex-TASK-001.md
+
+Review only these items:
+1. Whether python/python3 command ambiguity is fixed.
+2. Whether scripts and prompt templates now use python3 consistently.
+3. Whether the clipboard handoff convention is safe and file-first.
+4. Whether tests pass.
+5. Whether any runtime security behavior changed unexpectedly.
+
+Do not review unrelated product features or broaden the task scope.
+Do not recommend stealth, ban bypass, proxy rotation for evasion, browser session scraping, raw LLM shell execution, unauthorized scanning behavior, or direct pushes to main.
+
+Expected output:
+- Verdict: PASS, CONDITIONAL_PASS, or FAIL.
+- Findings limited to the five review items above.
+- For each finding, include file path, severity, rationale, and required/not required.
