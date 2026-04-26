@@ -40,7 +40,7 @@ Aegis EV uses a local-first architecture:
 
 ## Current Task
 
-TASK-001C local agent relay.
+TASK-002 policy core hardening.
 
 ## Open Decisions
 
@@ -52,3 +52,5 @@ TASK-001C local agent relay.
 - TASK-001 repository hygiene and multi-agent workflow documentation were added.
 - Local commands and prompt templates were standardized on `python3`.
 - TASK-001C is adding a local file-based Codex/Gemini relay with repo memory and local CLI orchestration.
+- TASK-002 hardens the deterministic policy core before additional AI or tool execution features.
+- Policy decisions now emphasize explicit authorization windows, scoped targets, impact levels, approvals, budgets, and audit-safe serialization.

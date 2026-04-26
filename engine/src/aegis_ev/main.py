@@ -4,11 +4,12 @@ import argparse
 import json
 import sys
 from dataclasses import asdict
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from .adapters.safe_headers import fetch_and_analyze_headers
 from .audit import AuditLog
-from .models import AuthorizationProfile, ImpactLevel, RequestBudget, ToolIntent
+from .models import AuthorizationProfile, Environment, ImpactLevel, PolicyBudget, RequestBudget, ToolIntent
 from .policy import PolicyEngine
 
 
@@ -22,7 +23,16 @@ def _json_default(value):
 
 def validate_command(args: argparse.Namespace) -> int:
     audit = AuditLog(args.audit_log)
-    auth = AuthorizationProfile(owner="local-user", allowed_domains=args.allow_domain)
+    now = datetime.now(timezone.utc)
+    auth = AuthorizationProfile(
+        owner="local-user",
+        allowed_domains=args.allow_domain,
+        valid_from=now - timedelta(minutes=5),
+        valid_until=now + timedelta(hours=1),
+        environment=Environment.DEVELOPMENT,
+        allowed_impact_levels=[ImpactLevel.GREEN],
+        request_budget=PolicyBudget(max_requests=1),
+    )
     intent = ToolIntent(
         adapter="safe_headers",
         target=args.target,
@@ -35,8 +45,8 @@ def validate_command(args: argparse.Namespace) -> int:
     audit.append(
         actor="system",
         action=f"policy.{decision.decision.value}",
-        target=args.target,
-        details={"reason": decision.reason, "adapter": intent.adapter},
+        target=decision.normalized_target,
+        details=decision.to_audit_details(),
     )
 
     if not decision.allowed:
