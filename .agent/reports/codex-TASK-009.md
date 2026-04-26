@@ -5,6 +5,7 @@
 - Added a deterministic supplied-data web header and configuration analysis module with no live HTTP requests or external tool execution.
 - Integrated the check logic with the safe adapter framework, evidence/finding pipeline, and engine CLI/API contract.
 - Added deterministic tests for header findings, redaction behavior, adapter safety, and JSON command output.
+- Patched the legacy `safe_headers` compatibility wrapper so legacy evidence also redacts `Authorization`, `Cookie`, and `Set-Cookie` style secrets.
 
 ## Files Changed
 
@@ -30,8 +31,12 @@
 
 - Targeted engine tests for the new module passed:
   - `cd engine && PYTHONPATH=src python3 -m unittest tests.test_web_header_checks tests.test_adapter_framework tests.test_cli_contracts tests.test_safe_headers`
-
-Full validation and relay QA results will be updated below after execution.
+- Full validation passed:
+  - `./scripts/run_tests.sh`
+  - `cd engine && PYTHONPATH=src python3 -m unittest discover -s tests`
+  - `git diff --check`
+  - `python3 scripts/local_agent_relay.py --task-id TASK-009-safe-web-header-config-checks --dry-run --once`
+  - `bash scripts/check_agent_relay_prereqs.sh`
 
 ## Security Posture
 
@@ -56,4 +61,6 @@ Full validation and relay QA results will be updated below after execution.
 
 ## Gemini QA
 
-- Pending.
+- `python3 scripts/local_agent_relay.py --task-id TASK-009-safe-web-header-config-checks --once --max-loops 1` - completed.
+- Gemini verdict: `PASS`.
+- Codex follow-up path was not invoked because Gemini returned `PASS`.
