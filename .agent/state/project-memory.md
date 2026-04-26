@@ -40,7 +40,7 @@ Aegis EV uses a local-first architecture:
 
 ## Current Task
 
-TASK-003 audit log durability.
+TASK-004 safe tool adapter framework.
 
 ## Open Decisions
 
@@ -55,3 +55,4 @@ TASK-003 audit log durability.
 - TASK-002 hardens the deterministic policy core before additional AI or tool execution features.
 - Policy decisions now emphasize explicit authorization windows, scoped targets, impact levels, approvals, budgets, and audit-safe serialization.
 - TASK-003 hardens audit log durability with structured events, deterministic hashes, verification results, and secret redaction.
+- TASK-004 adds a planning-only safe adapter framework with structured requests, registry, policy/audit integration, and no real scanner execution.
