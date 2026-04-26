@@ -1,5 +1,6 @@
 # Python
 __pycache__/
+*.pyc
 *.py[cod]
 .venv/
 .pytest_cache/
@@ -15,7 +16,11 @@ __pycache__/
 node_modules/
 dist/
 build/
+target/
 src-tauri/target/
+
+# Agent scratch space
+.agent/tmp/
 
 # OS/IDE
 .DS_Store
