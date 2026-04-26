@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+*.egg-info/
+
+# Local app data
+.aegis/
+.env
+.env.*
+!.env.example
+
+# Node/Tauri later
+node_modules/
+dist/
+build/
+src-tauri/target/
+
+# OS/IDE
+.DS_Store
+.vscode/
+.idea/

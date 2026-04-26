@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant User
+    participant UI as Tauri UI
+    participant Policy as Policy Gateway
+    participant Adapter as Safe Adapter
+    participant Audit as Audit Log
+    participant Evidence as Evidence Store
+    participant AI as AI Verifier/Reporter
+
+    User->>UI: Define target and authorization
+    UI->>Policy: validate_target(target, profile)
+    Policy->>Audit: record policy decision
+    Policy->>Adapter: run structured intent
+    Adapter->>Audit: record adapter start/stop
+    Adapter->>Evidence: store normalized evidence
+    Evidence->>AI: provide evidence context
+    AI->>UI: finding explanation and report draft

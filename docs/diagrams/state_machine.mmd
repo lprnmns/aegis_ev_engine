@@ -1,0 +1,18 @@
+stateDiagram-v2
+    [*] --> DraftScope
+    DraftScope --> PolicyCheck: user starts validation
+    PolicyCheck --> Denied: out of scope
+    PolicyCheck --> ApprovalRequired: sensitive action
+    PolicyCheck --> Running: allowed green action
+    ApprovalRequired --> Denied: rejected
+    ApprovalRequired --> Running: approved
+    Running --> Paused: user pause
+    Paused --> Running: resume
+    Running --> Stopped: kill switch
+    Running --> Completed: budget complete
+    Running --> Inconclusive: blocked or evidence insufficient
+    Completed --> Reported
+    Inconclusive --> Reported
+    Denied --> [*]
+    Reported --> Retest
+    Retest --> PolicyCheck

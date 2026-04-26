@@ -1,0 +1,13 @@
+flowchart TD
+    UI[Tauri UI] --> PG[Policy Gateway]
+    PG --> AUTH[Authorization Profile]
+    PG --> SCHED[Job Scheduler]
+    PG --> APPROVAL[Approval Queue]
+    SCHED --> ADAPTERS[Safe Tool Adapters]
+    ADAPTERS --> EVIDENCE[Evidence Store]
+    ADAPTERS --> AUDIT[Hash-Chained Audit Log]
+    EVIDENCE --> VERIFIER[AI Verifier]
+    VERIFIER --> FINDINGS[Findings]
+    FINDINGS --> REPORTER[AI Reporter]
+    REPORTER --> REPORT[Markdown/PDF Report]
+    PG -. denies/approves .-> AUDIT

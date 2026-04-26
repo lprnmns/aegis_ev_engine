@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aegis-ev-engine"
+version = "0.1.0"
+description = "Policy-gated engine skeleton for authorized Web/API exposure validation"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+dev = []
+
+[project.scripts]
+aegis-ev = "aegis_ev.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
