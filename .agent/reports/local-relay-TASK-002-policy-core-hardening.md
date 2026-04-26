@@ -1,3 +1,10 @@
+# Local Relay Report: TASK-002-policy-core-hardening
+
+Updated: 2026-04-26T14:48:30.701762+00:00
+
+## State
+
+```json
 {
   "task_id": "TASK-002-policy-core-hardening",
   "branch": "feat/TASK-002-policy-core-hardening",
@@ -10,3 +17,8 @@
   "next_actor": "done",
   "blocked": false
 }
+```
+
+## Events
+
+- Gemini verdict: `PASS`.
