@@ -1,3 +1,10 @@
+# Local Relay Report: TASK-007-engine-cli-api-contract
+
+Updated: 2026-04-26T15:58:39.253315+00:00
+
+## State
+
+```json
 {
   "task_id": "TASK-007-engine-cli-api-contract",
   "branch": "feat/TASK-007-engine-cli-api-contract",
@@ -10,3 +17,8 @@
   "next_actor": "done",
   "blocked": false
 }
+```
+
+## Events
+
+- Gemini verdict: `PASS`.
