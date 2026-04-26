@@ -19,6 +19,24 @@ require_cmd() {
   fi
 }
 
+load_nvm_if_present() {
+  if command -v nvm >/dev/null 2>&1; then
+    return 0
+  fi
+  if [[ -s "${NVM_DIR:-$HOME/.nvm}/nvm.sh" ]]; then
+    # shellcheck source=/dev/null
+    . "${NVM_DIR:-$HOME/.nvm}/nvm.sh"
+    return 0
+  fi
+  return 1
+}
+
+major_version() {
+  local value="$1"
+  value="${value#v}"
+  printf '%s\n' "${value%%.*}"
+}
+
 if ! command -v git >/dev/null 2>&1; then
   note "MISSING: git"
   note "Hint: install git and run this script from the repository root."
@@ -46,6 +64,35 @@ else
 fi
 
 require_cmd codex "Install and log in to the local Codex CLI using its normal account login flow. Do not add API keys to this repo."
+
+if ! command -v gemini >/dev/null 2>&1; then
+  load_nvm_if_present || true
+fi
+
+if command -v node >/dev/null 2>&1; then
+  node_version="$(node -v)"
+  node_major="$(major_version "$node_version")"
+  if [[ "$node_major" -ge 20 ]]; then
+    note "OK: node $node_version"
+  else
+    note "FAIL: node $node_version is too old for Gemini CLI; Node 20+ is required."
+    note "Hint: use an existing nvm installation to install/use an LTS Node 20+ release. Do not add API keys to this repo."
+    failures=$((failures + 1))
+  fi
+else
+  note "MISSING: node"
+  note "Hint: install Node 20+ using your normal local toolchain. Do not add API keys to this repo."
+  failures=$((failures + 1))
+fi
+
+if command -v npm >/dev/null 2>&1; then
+  note "OK: npm $(npm -v)"
+else
+  note "MISSING: npm"
+  note "Hint: install npm with Node 20+ using your normal local toolchain. Do not add API keys to this repo."
+  failures=$((failures + 1))
+fi
+
 require_cmd gemini "Install and log in to the local Gemini CLI using its normal account login flow. Do not add API keys to this repo."
 
 if [[ -x scripts/run_tests.sh ]]; then

@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -48,6 +49,10 @@ def run_cmd(
         capture_output=capture,
         check=check,
     )
+
+
+def shell_quote(value: str) -> str:
+    return shlex.quote(value)
 
 
 def git(args: list[str], *, check: bool = True) -> subprocess.CompletedProcess[str]:
@@ -212,13 +217,23 @@ def parse_verdict(output: str) -> tuple[str | None, str | None]:
     return None, "Gemini output contained more than one verdict line."
 
 
+def gemini_shell_prefix() -> str:
+    return (
+        'if ! command -v gemini >/dev/null 2>&1 && [ -s "${NVM_DIR:-$HOME/.nvm}/nvm.sh" ]; then '
+        '. "${NVM_DIR:-$HOME/.nvm}/nvm.sh"; '
+        'nvm use --lts >/dev/null; '
+        'fi; '
+    )
+
+
 def call_gemini(prompt: str, model: str | None) -> str:
     args = ["gemini"]
     if model:
         args.extend(["-m", model])
     if len(prompt) <= PROMPT_ARG_LIMIT:
         args.extend(["-p", prompt])
-        result = run_cmd(args, check=False)
+        command = gemini_shell_prefix() + " ".join(shell_quote(arg) for arg in args)
+        result = run_cmd(["bash", "-lc", command], check=False)
         return (result.stdout or "") + (result.stderr or "")
 
     TMP_DIR.mkdir(parents=True, exist_ok=True)
@@ -234,7 +249,8 @@ def call_gemini(prompt: str, model: str | None) -> str:
             f"Prompt file: {temp_path}"
         )
         args.extend(["-p", short_prompt])
-        result = run_cmd(args, check=False)
+        command = gemini_shell_prefix() + " ".join(shell_quote(arg) for arg in args)
+        result = run_cmd(["bash", "-lc", command], check=False)
         return (result.stdout or "") + (result.stderr or "")
     finally:
         temp_path.unlink(missing_ok=True)
