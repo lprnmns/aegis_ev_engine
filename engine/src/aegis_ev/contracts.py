@@ -682,3 +682,25 @@ def _consume_store_approval(
         store._items[approval.approval_id] = approval
     store.export_json(Path(store_path))
     return approval
+
+# Import API import commands module
+from .contracts_api_imports import (
+    import_openapi_command,
+    import_postman_command,
+    import_har_command
+)
+
+# Add API import commands to run_contract_command
+original_run_contract_command = run_contract_command
+
+def run_contract_command(command: str, payload: dict[str, Any]) -> CommandResponse:
+    # Handle API import commands
+    if command == "import-openapi":
+        return import_openapi_command(payload)
+    if command == "import-postman":
+        return import_postman_command(payload)
+    if command == "import-har":
+        return import_har_command(payload)
+    
+    # Call original function for other commands
+    return original_run_contract_command(command, payload)

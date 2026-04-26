@@ -27,3 +27,5 @@ __all__ = [
     "WebHeaderConfigCheckAdapter",
     "default_registry",
 ]
+
+from .api_import_adapter import ApiImportAdapter

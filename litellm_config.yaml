@@ -1,0 +1,6 @@
+model_list:
+  - model_name: deepseek-v4-pro          # Codex içinde kullanacağın isim
+    litellm_params:
+      model: nvidia_nim/deepseek-ai/deepseek-v4-pro
+      api_key: os.environ/NVIDIA_API_KEY   # senin env variable'ından alacak
+      api_base: https://integrate.api.nvidia.com/v1

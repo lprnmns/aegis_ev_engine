@@ -19,7 +19,7 @@ Phase 1 is Modern Web/API validation only.
 - No credential attacks, brute force, password spraying, or session hijacking.
 - No direct push to `main`.
 - No automatic merge into `beta`.
-- Local development/testing uses account-authenticated Codex CLI and Gemini CLI, not API keys.
+- Local development/testing uses account-authenticated local CLIs, not API keys.
 - API key/BYOK support is future production/customer-provider scope only.
 - Never inspect or commit CLI auth files, browser/session credentials, cookies, tokens, keyrings, auth caches, or credential stores.
 
@@ -43,7 +43,7 @@ Aegis EV uses a local-first architecture:
 
 ## Current Task
 
-TASK-009 safe web header config checks.
+TASK-010 api import foundation.
 
 ## Open Decisions
 
@@ -65,3 +65,4 @@ TASK-009 safe web header config checks.
 - TASK-007 adds a deterministic JSON CLI/API contract for policy validation, dry-run adapter planning, report rendering, and audit verification for future Tauri sidecar integration.
 - TASK-008 adds a local approval queue and HITL lifecycle for policy/adapters, plus approval-aware audit, evidence, and CLI contract commands.
 - TASK-009 adds deterministic supplied-data web header and configuration analysis with secret-safe evidence, candidate findings, and no live network requests.
+- TASK-010 adds API import foundation for OpenAPI/Postman/HAR files with safe parsing, normalization, and evidence generation without live network requests.
