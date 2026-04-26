@@ -2,6 +2,6 @@
 
 Latest tracked Builder task report:
 
-- `.agent/reports/codex-TASK-004.md`
+- `.agent/reports/codex-TASK-004B.md`
 
 This pointer is safe for local relay context reconstruction. It must not contain secrets, API keys, cookies, tokens, or credential material.

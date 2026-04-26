@@ -15,6 +15,19 @@ The relay does not require `OPENAI_API_KEY`, `CODEX_API_KEY`, `GEMINI_API_KEY`, 
 
 GitHub Actions can be useful later for CI, but it is not the right default for this user workflow because it would require remote runners, secret configuration, and another operational surface. The local relay keeps coordination on the user's machine and inside the repository.
 
+## Local Account Auth, Not API Keys
+
+Local relay development and testing use already logged-in local CLIs:
+
+- Codex CLI uses the user's local ChatGPT/Codex account session and plan limits.
+- Gemini CLI uses the user's local Gemini account session and plan limits.
+
+No `OPENAI_API_KEY`, `CODEX_API_KEY`, `GEMINI_API_KEY`, `GOOGLE_API_KEY`, or GitHub Actions secret is required for local relay testing.
+
+API key/BYOK support is future production/customer-provider scope only. It must be handled in a separate, explicitly scoped task with proper storage, redaction, and review.
+
+GitHub Actions or other cloud runner modes must not receive personal account credentials or copied CLI session material. Never copy, inspect, print, modify, commit, or depend on auth files such as `~/.codex/`, `~/.gemini/`, browser cookies, session tokens, credential stores, keyrings, or auth caches.
+
 ## Single-Orchestrator Design
 
 One local relay process owns the loop:

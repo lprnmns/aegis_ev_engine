@@ -20,6 +20,17 @@ Do **not** implement, suggest, or enable:
 8. Storage of GitHub tokens, OpenAI keys, cookies, customer secrets, or credentials in source code.
 9. Direct push to `main` unless the repository owner explicitly does it locally after review.
 
+## Local development authentication
+
+Local development and testing use account-authenticated local CLIs:
+
+- Codex CLI authenticated through the user's ChatGPT/Codex account and plan limits.
+- Gemini CLI authenticated through the user's local Gemini account session.
+
+Do not require `OPENAI_API_KEY`, `CODEX_API_KEY`, `GEMINI_API_KEY`, `GOOGLE_API_KEY`, or GitHub Actions secrets for local relay, local QA, or local testing. API key/BYOK support is future production/customer-provider scope only and must be explicitly tasked.
+
+Never inspect, copy, print, modify, commit, or depend on CLI auth files, browser/session credentials, cookies, tokens, keyrings, auth caches, or credential stores.
+
 ## Required design posture
 
 Every change must preserve:

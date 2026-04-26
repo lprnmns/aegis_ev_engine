@@ -15,6 +15,10 @@ The relay uses account-authenticated local CLIs:
 
 GitHub Actions mode is optional and not required for this workflow. The local relay does not require OpenAI, Codex, Gemini, Google, or GitHub Actions API secrets.
 
+Agents should not ask the user for OpenAI, Codex, Gemini, Google, or other AI provider API keys during local development, local relay runs, or local QA. The user's account-authenticated CLI sessions and plan limits apply.
+
+API key/BYOK support is future production/customer-provider scope only. Any such work must be a separate, explicit task and must not be mixed into local relay/testing workflow tasks.
+
 Repo memory is the source of truth. Chat memory is not required for task continuity because each non-interactive run rebuilds context from `AGENTS.md`, `docs/`, `adr/`, `.agent/state/`, latest reports, and the current Git diff.
 
 The user still controls final review and merge. Agents may push only the current `feat/*` branch; they must not push `main`, merge `beta`, force push, or rewrite history.
