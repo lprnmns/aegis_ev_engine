@@ -45,4 +45,7 @@
 
 ## Gemini QA
 
-- Pending.
+- `python3 scripts/local_agent_relay.py --task-id TASK-005-evidence-store-and-finding-model --once --max-loops 1` - completed.
+- Gemini verdict: `PASS`.
+- Codex follow-up path was not invoked because the Gemini verdict was `PASS`.
+- No required fixes were reported.
