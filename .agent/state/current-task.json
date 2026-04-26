@@ -5,8 +5,8 @@
   "status": "in_progress",
   "loop_count": 0,
   "max_loops": 1,
-  "last_codex_commit": null,
+  "last_codex_commit": "d60eb18ac36f29a47698fc985f4726acedca3c2e",
   "last_gemini_verdict": null,
-  "next_actor": "codex",
+  "next_actor": "gemini",
   "blocked": false
 }

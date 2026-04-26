@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Mapping
 from uuid import uuid4
 
+from aegis_ev.audit import redact_value
 from aegis_ev.checks.web_headers import WebHeaderAnalysisInput, analyze_web_headers
 from aegis_ev.models import Evidence, EvidenceKind, Finding
 from datetime import datetime, timezone
@@ -29,7 +30,7 @@ def analyze_headers(target: str, status_code: int, headers: Mapping[str, str]) -
         kind=EvidenceKind.HTTP_HEADER_OBSERVATION,
         target=target,
         observed_at=datetime.now(timezone.utc),
-        data={"status_code": status_code, "headers": dict(normalized)},
+        data={"status_code": status_code, "headers": redact_value(dict(normalized))},
     )
     findings = [
         Finding(
