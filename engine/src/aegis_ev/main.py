@@ -21,6 +21,17 @@ MACHINE_COMMANDS = (
     "reject-action",
     "consume-approval",
     "approval-status",
+    "create-project",
+    "get-project",
+    "list-projects",
+    "add-target",
+    "list-targets",
+    "create-session",
+    "get-session",
+    "list-sessions",
+    "update-session-status",
+    "validate-project-target",
+    "link-project-reference",
 )
 
 

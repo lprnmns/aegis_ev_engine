@@ -43,7 +43,7 @@ Aegis EV uses a local-first architecture:
 
 ## Current Task
 
-TASK-010 GPT audit and repair of API import foundation.
+TASK-011 project, target, scope, and session model.
 
 ## Open Decisions
 
@@ -66,3 +66,4 @@ TASK-010 GPT audit and repair of API import foundation.
 - TASK-008 adds a local approval queue and HITL lifecycle for policy/adapters, plus approval-aware audit, evidence, and CLI contract commands.
 - TASK-009 adds deterministic supplied-data web header and configuration analysis with secret-safe evidence, candidate findings, and no live network requests.
 - TASK-010 was initially committed directly to `beta` by an untrusted non-OpenAI provider run. GPT recovery identified bad commit `789cdb400c90184505dc927848340f07f65e6996`, removed repository-local LiteLLM config, and rebuilt the API import foundation with safe OpenAPI/Postman/HAR parsing, endpoint inventory, evidence integration, adapter/CLI contract support, redaction, and no live network, HAR replay, Postman script execution, or confirmed findings.
+- TASK-011 adds durable project, target, scope, session, and workspace store models with CLI/API contract commands, policy-backed scope validation, reference linking, portfolio-demo placeholder readiness, and no live network or secret/session material storage.

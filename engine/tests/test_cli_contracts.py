@@ -231,6 +231,74 @@ class EngineCliContractTests(unittest.TestCase):
         self.assertFalse(response["ok"])
         self.assertEqual(response["error"]["code"], "invalid_import")
 
+    def test_cli_create_project_returns_parseable_json(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            store_path = str(Path(tmp) / "workspace.json")
+            code, response = run_cli(
+                ["create-project"],
+                {
+                    "workspace_store": store_path,
+                    "project": {
+                        "project_id": "project_cli",
+                        "name": "Portfolio Placeholder",
+                        "scope": {
+                            "scope_id": "scope_cli",
+                            "allowlist_domains": ["portfolio.example.test"],
+                            "allowed_schemes": ["https"],
+                            "valid_from": "2026-01-01T00:00:00+00:00",
+                            "valid_until": "2026-12-31T00:00:00+00:00",
+                        },
+                    },
+                },
+            )
+            self.assertEqual(code, 0)
+            self.assertTrue(response["ok"])
+            self.assertEqual(response["result"]["project"]["project_id"], "project_cli")
+
+    def test_cli_add_target_returns_parseable_json(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            store_path = str(Path(tmp) / "workspace.json")
+            run_cli(
+                ["create-project"],
+                {
+                    "workspace_store": store_path,
+                    "project": {
+                        "project_id": "project_cli",
+                        "name": "Portfolio Placeholder",
+                        "scope": {
+                            "scope_id": "scope_cli",
+                            "allowlist_domains": ["portfolio.example.test"],
+                            "allowed_schemes": ["https"],
+                            "valid_from": "2026-01-01T00:00:00+00:00",
+                            "valid_until": "2026-12-31T00:00:00+00:00",
+                        },
+                    },
+                },
+            )
+            code, response = run_cli(
+                ["add-target"],
+                {
+                    "workspace_store": store_path,
+                    "project_id": "project_cli",
+                    "target": {
+                        "target_type": "url",
+                        "value": "https://portfolio.example.test?token=" + SECRET_VALUE,
+                    },
+                },
+            )
+            self.assertEqual(code, 0)
+            self.assertTrue(response["ok"])
+            target = response["result"]["target"]
+            self.assertTrue(target["in_scope"])
+            self.assertEqual(target["normalized_value"], "https://portfolio.example.test")
+            self.assertNotIn(SECRET_VALUE, json.dumps(response, sort_keys=True))
+
+    def test_cli_project_invalid_input_returns_structured_error(self):
+        code, response = run_cli(["create-project"], {"project": {"project_id": "project_bad", "status": "done"}})
+        self.assertEqual(code, 1)
+        self.assertFalse(response["ok"])
+        self.assertEqual(response["error"]["code"], "invalid_request")
+
     def test_report_render_returns_deterministic_markdown(self):
         payload = report_payload(format="markdown")
         first = run_cli(["render-report"], payload)

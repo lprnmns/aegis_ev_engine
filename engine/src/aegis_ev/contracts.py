@@ -27,6 +27,14 @@ from .evidence import EvidenceRecord, EvidenceStore, FindingRecord
 from .imports import evidence_from_import_result, import_har, import_openapi, import_postman
 from .models import AuthorizationProfile, ImpactLevel, PolicyBudget, RequestBudget, ToolIntent
 from .policy import PolicyEngine
+from .projects import (
+    ProjectWorkspaceStore,
+    create_project_record,
+    create_session_record,
+    create_target_record,
+    scope_from_dict,
+    validate_target_against_scope,
+)
 from .reporting import create_report, render_report_json, render_report_markdown
 
 
@@ -150,6 +158,28 @@ def run_contract_command(command: str, payload: dict[str, Any]) -> CommandRespon
             return consume_approval(payload)
         if command == "approval-status":
             return approval_status(payload)
+        if command == "create-project":
+            return create_project(payload)
+        if command == "get-project":
+            return get_project(payload)
+        if command == "list-projects":
+            return list_projects(payload)
+        if command == "add-target":
+            return add_target(payload)
+        if command == "list-targets":
+            return list_targets(payload)
+        if command == "create-session":
+            return create_session(payload)
+        if command == "get-session":
+            return get_session(payload)
+        if command == "list-sessions":
+            return list_sessions(payload)
+        if command == "update-session-status":
+            return update_session_status(payload)
+        if command == "validate-project-target":
+            return validate_project_target(payload)
+        if command == "link-project-reference":
+            return link_project_reference(payload)
         return failure(command, "unsupported_command", f"Unsupported command: {command}")
     except (KeyError, TypeError, ValueError) as exc:
         return failure(command, "invalid_request", str(exc))
@@ -453,6 +483,98 @@ def _import_api_description(command: str, payload: dict[str, Any], importer: Any
     return success(command, response, warnings=warnings)
 
 
+def create_project(payload: dict[str, Any]) -> CommandResponse:
+    store, store_path = _workspace_store(payload)
+    project = create_project_record(_required_dict(payload, "project"))
+    store.create_project(project)
+    _export_workspace_if_configured(store, store_path)
+    return success("create-project", {"project": project.to_dict()})
+
+
+def get_project(payload: dict[str, Any]) -> CommandResponse:
+    store, _store_path = _workspace_store(payload)
+    project = store.get_project(str(_required(payload, "project_id")))
+    return success("get-project", {"project": project.to_dict()})
+
+
+def list_projects(payload: dict[str, Any]) -> CommandResponse:
+    store, _store_path = _workspace_store(payload)
+    return success("list-projects", {"projects": [project.to_dict() for project in store.list_projects()]})
+
+
+def add_target(payload: dict[str, Any]) -> CommandResponse:
+    store, store_path = _workspace_store(payload)
+    project = store.get_project(str(_required(payload, "project_id")))
+    target = create_target_record(_required_dict(payload, "target"), project)
+    stored = store.add_target(project.project_id, target)
+    _export_workspace_if_configured(store, store_path)
+    return success("add-target", {"target": stored.to_dict(), "project": store.get_project(project.project_id).to_dict()})
+
+
+def list_targets(payload: dict[str, Any]) -> CommandResponse:
+    store, _store_path = _workspace_store(payload)
+    targets = [target.to_dict() for target in store.list_project_targets(str(_required(payload, "project_id")))]
+    return success("list-targets", {"targets": targets})
+
+
+def create_session(payload: dict[str, Any]) -> CommandResponse:
+    store, store_path = _workspace_store(payload)
+    session = create_session_record(_required_dict(payload, "session"))
+    store.create_session(session)
+    _export_workspace_if_configured(store, store_path)
+    return success("create-session", {"session": session.to_dict()})
+
+
+def get_session(payload: dict[str, Any]) -> CommandResponse:
+    store, _store_path = _workspace_store(payload)
+    session = store.get_session(str(_required(payload, "session_id")))
+    return success("get-session", {"session": session.to_dict()})
+
+
+def list_sessions(payload: dict[str, Any]) -> CommandResponse:
+    store, _store_path = _workspace_store(payload)
+    sessions = [session.to_dict() for session in store.list_sessions(payload.get("project_id"))]
+    return success("list-sessions", {"sessions": sessions})
+
+
+def update_session_status(payload: dict[str, Any]) -> CommandResponse:
+    store, store_path = _workspace_store(payload)
+    session = store.update_session_status(str(_required(payload, "session_id")), str(_required(payload, "status")))
+    _export_workspace_if_configured(store, store_path)
+    return success("update-session-status", {"session": session.to_dict()})
+
+
+def validate_project_target(payload: dict[str, Any]) -> CommandResponse:
+    scope = scope_from_dict(_required_dict(payload, "scope"))
+    result = validate_target_against_scope(
+        str(_required(payload, "value")),
+        str(_required(payload, "target_type")),
+        scope,
+        owner=str(payload.get("owner", scope.owner_attestation or scope.scope_id)),
+        now=_optional_datetime(payload.get("now")),
+    )
+    return success("validate-project-target", result)
+
+
+def link_project_reference(payload: dict[str, Any]) -> CommandResponse:
+    store, store_path = _workspace_store(payload)
+    project_id = str(_required(payload, "project_id"))
+    reference_type = str(_required(payload, "reference_type"))
+    reference_id = str(_required(payload, "reference_id"))
+    if reference_type == "import":
+        project = store.add_import_reference(project_id, reference_id)
+    elif reference_type == "evidence":
+        project = store.add_evidence_reference(project_id, reference_id)
+    elif reference_type == "finding":
+        project = store.add_finding_reference(project_id, reference_id)
+    elif reference_type == "report":
+        project = store.add_report_reference(project_id, reference_id)
+    else:
+        raise ValueError("reference_type must be import, evidence, finding, or report")
+    _export_workspace_if_configured(store, store_path)
+    return success("link-project-reference", {"project": project.to_dict()})
+
+
 def verify_audit(payload: dict[str, Any]) -> CommandResponse:
     audit_log = Path(str(_required(payload, "audit_log")))
     warnings: list[str] = []
@@ -667,6 +789,19 @@ def _optional_datetime(value: Any) -> datetime | None:
 
 def _approval_store_path(payload: dict[str, Any]) -> Path:
     return Path(str(_required(payload, "approval_store")))
+
+
+def _workspace_store(payload: dict[str, Any]) -> tuple[ProjectWorkspaceStore, Path | None]:
+    store_path = payload.get("workspace_store") or payload.get("project_store")
+    if store_path:
+        path = Path(str(store_path))
+        return ProjectWorkspaceStore.import_json(path), path
+    return ProjectWorkspaceStore(), None
+
+
+def _export_workspace_if_configured(store: ProjectWorkspaceStore, store_path: Path | None) -> None:
+    if store_path is not None:
+        store.export_json(store_path)
 
 
 def _create_policy_approval_request(

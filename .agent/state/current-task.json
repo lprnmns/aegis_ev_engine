@@ -1,12 +1,12 @@
 {
-  "task_id": "TASK-010-gpt-audit-repair",
-  "branch": "feat/TASK-010-gpt-audit-repair",
+  "task_id": "TASK-011-project-target-scope-model",
+  "branch": "feat/TASK-011-project-target-scope-model",
   "base_branch": "beta",
-  "status": "local_tests_passed",
+  "status": "in_progress",
   "loop_count": 0,
   "max_loops": 1,
   "last_codex_commit": null,
   "last_gemini_verdict": null,
-  "next_actor": "gemini",
+  "next_actor": "codex",
   "blocked": false
 }
