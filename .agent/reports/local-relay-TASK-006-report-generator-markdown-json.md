@@ -1,3 +1,10 @@
+# Local Relay Report: TASK-006-report-generator-markdown-json
+
+Updated: 2026-04-26T15:52:15.458443+00:00
+
+## State
+
+```json
 {
   "task_id": "TASK-006-report-generator-markdown-json",
   "branch": "feat/TASK-006-report-generator-markdown-json",
@@ -10,3 +17,8 @@
   "next_actor": "done",
   "blocked": false
 }
+```
+
+## Events
+
+- Gemini verdict: `PASS`.
