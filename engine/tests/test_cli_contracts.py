@@ -214,6 +214,108 @@ class EngineCliContractTests(unittest.TestCase):
             self.assertEqual(code, 0)
             self.assertTrue(response["ok"])
 
+    def test_cli_create_list_approve_reject_consume_commands_return_stable_json(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            store_path = str(Path(tmp) / "approvals.json")
+            create_payload = {
+                "approval_store": store_path,
+                "approval": {
+                    "approval_id": "approval_1",
+                    "created_at_utc": "2026-01-01T00:00:00+00:00",
+                    "requested_by": "builder",
+                    "requested_actor_type": "human",
+                    "action_type": "plan",
+                    "target": "https://example.com/path",
+                    "normalized_target": "https://example.com/path",
+                    "impact_level": "red",
+                    "reason": "Red action",
+                    "policy_decision_code": "red_requires_approval",
+                    "adapter_id": "echo_plan",
+                    "adapter_action": "plan",
+                    "required_approval_scope": {
+                        "target": "https://example.com/path",
+                        "normalized_target": "https://example.com/path",
+                        "action_type": "plan",
+                        "impact_level": "red",
+                        "adapter_id": "echo_plan",
+                        "adapter_action": "plan",
+                    },
+                },
+            }
+            code, response = run_cli(["create-approval"], create_payload)
+            self.assertEqual(code, 0)
+            self.assertTrue(response["ok"])
+            code, response = run_cli(["list-approvals"], {"approval_store": store_path})
+            self.assertEqual(code, 0)
+            self.assertEqual(len(response["result"]["approvals"]), 1)
+            code, response = run_cli(
+                ["approve-action"],
+                {"approval_store": store_path, "approval_id": "approval_1", "approved_by": "reviewer", "actor_type": "human"},
+            )
+            self.assertEqual(code, 0)
+            self.assertEqual(response["result"]["approval"]["status"], "approved")
+            code, response = run_cli(
+                ["consume-approval"],
+                {"approval_store": store_path, "approval_id": "approval_1", "consumer": "adapter"},
+            )
+            self.assertEqual(code, 0)
+            self.assertEqual(response["result"]["approval"]["status"], "consumed")
+
+            reject_store = str(Path(tmp) / "approvals_reject.json")
+            code, response = run_cli(["create-approval"], create_payload | {"approval_store": reject_store})
+            self.assertEqual(code, 0)
+            code, response = run_cli(
+                ["reject-action"],
+                {"approval_store": reject_store, "approval_id": "approval_1", "rejected_by": "reviewer", "actor_type": "human"},
+            )
+            self.assertEqual(code, 0)
+            self.assertEqual(response["result"]["approval"]["status"], "rejected")
+
+    def test_invalid_cli_input_for_approval_returns_structured_error(self):
+        code, response = run_cli(["approve-action"], {"approval_store": "/tmp/none"})
+        self.assertEqual(code, 1)
+        self.assertFalse(response["ok"])
+        self.assertEqual(response["error"]["code"], "invalid_request")
+
+    def test_matching_approved_request_can_allow_red_policy_validation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            store_path = str(Path(tmp) / "approvals.json")
+            code, response = run_cli(
+                ["validate-policy"],
+                {
+                    "target": "https://example.com/path",
+                    "impact": "red",
+                    "action_type": "plan",
+                    "adapter": "echo_plan",
+                    "authorization_profile": auth(),
+                    "approval_store": store_path,
+                    "create_approval_if_required": True,
+                    "approval_request": {"requested_by": "builder", "requested_actor_type": "human"},
+                },
+            )
+            self.assertEqual(code, 0)
+            self.assertFalse(response["result"]["policy_decision"]["allowed"])
+            approval_id = response["result"]["approval_request"]["approval_id"]
+            code, response = run_cli(
+                ["approve-action"],
+                {"approval_store": store_path, "approval_id": approval_id, "approved_by": "reviewer", "actor_type": "human"},
+            )
+            self.assertEqual(code, 0)
+            code, response = run_cli(
+                ["validate-policy"],
+                {
+                    "target": "https://example.com/path",
+                    "impact": "red",
+                    "action_type": "plan",
+                    "adapter": "echo_plan",
+                    "authorization_profile": auth(),
+                    "approval_store": store_path,
+                    "approval_id": approval_id,
+                },
+            )
+            self.assertEqual(code, 0)
+            self.assertTrue(response["result"]["policy_decision"]["allowed"])
+
 
 def report_payload(*, format="json", secret=False):
     summary = "Bearer " + SECRET_VALUE if secret else "One candidate finding."

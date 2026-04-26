@@ -6,7 +6,18 @@ import sys
 from .contracts import failure, load_json_input, run_contract_command
 
 
-MACHINE_COMMANDS = ("validate-policy", "plan-adapter", "render-report", "verify-audit")
+MACHINE_COMMANDS = (
+    "validate-policy",
+    "plan-adapter",
+    "render-report",
+    "verify-audit",
+    "create-approval",
+    "list-approvals",
+    "approve-action",
+    "reject-action",
+    "consume-approval",
+    "approval-status",
+)
 
 
 def build_parser() -> argparse.ArgumentParser:

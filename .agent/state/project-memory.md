@@ -43,7 +43,7 @@ Aegis EV uses a local-first architecture:
 
 ## Current Task
 
-TASK-007 engine CLI API contract.
+TASK-008 approval queue human in the loop.
 
 ## Open Decisions
 
@@ -63,3 +63,4 @@ TASK-007 engine CLI API contract.
 - TASK-005 adds evidence and finding models, deterministic evidence hashes, secret-safe serialization, conservative finding verification defaults, and in-memory/JSON/JSONL evidence store primitives.
 - TASK-006 adds deterministic JSON and Markdown report generation from evidence, findings, audit verification metadata, and project scope without PDF, UI, AI prose, scanner integration, or network side effects.
 - TASK-007 adds a deterministic JSON CLI/API contract for policy validation, dry-run adapter planning, report rendering, and audit verification for future Tauri sidecar integration.
+- TASK-008 adds a local approval queue and HITL lifecycle for policy/adapters, plus approval-aware audit, evidence, and CLI contract commands.
