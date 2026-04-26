@@ -1,0 +1,60 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Aegis EV Portfolio Demo API",
+    "version": "1.0.0"
+  },
+  "components": {
+    "securitySchemes": {
+      "DemoBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "security": [
+    {
+      "DemoBearer": []
+    }
+  ],
+  "paths": {
+    "/api/profile": {
+      "get": {
+        "operationId": "getProfile",
+        "summary": "Read public portfolio profile data",
+        "tags": [
+          "portfolio"
+        ],
+        "responses": {
+          "200": {
+            "description": "Profile data"
+          }
+        }
+      }
+    },
+    "/api/contact": {
+      "post": {
+        "operationId": "submitContact",
+        "summary": "Submit portfolio contact form",
+        "tags": [
+          "portfolio",
+          "contact"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted"
+          }
+        }
+      }
+    }
+  }
+}

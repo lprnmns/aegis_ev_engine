@@ -299,6 +299,21 @@ class EngineCliContractTests(unittest.TestCase):
         self.assertFalse(response["ok"])
         self.assertEqual(response["error"]["code"], "invalid_request")
 
+    def test_cli_run_demo_flow_returns_parseable_json(self):
+        code, response = run_cli(["run-demo-flow"], {"fixture_dir": "../fixtures/demo", "no_network": True})
+        self.assertEqual(code, 0)
+        self.assertTrue(response["ok"])
+        demo = response["result"]["demo"]
+        self.assertTrue(demo["no_network"])
+        self.assertGreater(demo["evidence_count"], 0)
+        self.assertIn("markdown", demo["reports"])
+
+    def test_cli_run_demo_flow_invalid_input_returns_structured_error(self):
+        code, response = run_cli(["run-demo-flow"], {"no_network": False})
+        self.assertEqual(code, 1)
+        self.assertFalse(response["ok"])
+        self.assertEqual(response["error"]["code"], "invalid_request")
+
     def test_report_render_returns_deterministic_markdown(self):
         payload = report_payload(format="markdown")
         first = run_cli(["render-report"], payload)

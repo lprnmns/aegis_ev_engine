@@ -1,12 +1,12 @@
 {
-  "task_id": "TASK-011-project-target-scope-model",
-  "branch": "feat/TASK-011-project-target-scope-model",
+  "task_id": "TASK-012-end-to-end-local-demo-flow",
+  "branch": "feat/TASK-012-end-to-end-local-demo-flow",
   "base_branch": "beta",
-  "status": "passed",
+  "status": "local_tests_passed",
   "loop_count": 0,
   "max_loops": 1,
-  "last_codex_commit": "ed66edef05f9630e69c121ff3bc141a5e65e7bcc",
-  "last_gemini_verdict": "PASS",
-  "next_actor": "done",
+  "last_codex_commit": null,
+  "last_gemini_verdict": null,
+  "next_actor": "gemini",
   "blocked": false
 }

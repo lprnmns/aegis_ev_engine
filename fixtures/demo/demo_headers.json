@@ -1,0 +1,13 @@
+{
+  "target": "https://portfolio.example.test",
+  "status_code": 200,
+  "content_type": "text/html; charset=utf-8",
+  "protocol": "https",
+  "headers": {
+    "Server": "DemoServer/1.0",
+    "Content-Type": "text/html; charset=utf-8",
+    "Access-Control-Allow-Origin": "*",
+    "Set-Cookie": "sessionid=not-a-real-demo-session-1234567890; Path=/"
+  },
+  "security_txt_present": false
+}
