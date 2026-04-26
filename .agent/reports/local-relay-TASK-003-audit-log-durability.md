@@ -1,3 +1,10 @@
+# Local Relay Report: TASK-003-audit-log-durability
+
+Updated: 2026-04-26T15:06:27.757221+00:00
+
+## State
+
+```json
 {
   "task_id": "TASK-003-audit-log-durability",
   "branch": "feat/TASK-003-audit-log-durability",
@@ -10,3 +17,8 @@
   "next_actor": "done",
   "blocked": false
 }
+```
+
+## Events
+
+- Gemini verdict: `PASS`.
