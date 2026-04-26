@@ -39,6 +39,8 @@ Flag any change that appears to introduce or normalize:
 - Documentation and ADRs are updated when architecture changes.
 - No secrets, keys, tokens, cookies, or customer data are present.
 - Handoff report is complete and accurate.
+- Any next-agent prompt uses `.agent/reports/next-prompt-<agent>-<TASK-ID>.txt` as the source of truth.
+- Clipboard use is optional and not required for task success.
 
 ## Finding Format
 

@@ -36,7 +36,7 @@ Run:
 
 ```bash
 cd engine
-PYTHONPATH=src python -m unittest discover -s tests
+PYTHONPATH=src python3 -m unittest discover -s tests
 ```
 
 Do not claim completion if tests fail.
@@ -69,4 +69,9 @@ Do not claim completion if tests fail.
 ## Residual Risk
 
 - <risk or `None identified`>
+
+## Next-Agent Prompt
+
+- Write any follow-up prompt to `.agent/reports/next-prompt-<agent>-<TASK-ID>.txt`.
+- Treat that file as the source of truth. Clipboard copy is optional and must not be required for task success.
 ```

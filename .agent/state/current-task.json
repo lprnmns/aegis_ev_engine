@@ -1,0 +1,12 @@
+{
+  "task_id": "TASK-001C-local-agent-relay",
+  "branch": "feat/TASK-001-repo-hygiene",
+  "base_branch": "beta",
+  "status": "in_progress",
+  "loop_count": 0,
+  "max_loops": 3,
+  "last_codex_commit": null,
+  "last_gemini_verdict": null,
+  "next_actor": "gemini",
+  "blocked": false
+}

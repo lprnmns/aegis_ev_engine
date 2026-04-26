@@ -4,6 +4,21 @@
 
 This workflow keeps multi-agent development reviewable and aligned with the AegisEV safety model. Codex acts as Builder. Gemini acts as QA. Humans retain ownership of merges, scope decisions, and final acceptance.
 
+## Local Relay Mode
+
+Local relay mode is preferred for this user's no-terminal copy/paste workflow. It coordinates Codex Builder and Gemini QA through tracked repo files, local reports, state files, local CLI calls, and feature-branch Git operations.
+
+The relay uses account-authenticated local CLIs:
+
+- `codex exec`
+- `gemini -p`
+
+GitHub Actions mode is optional and not required for this workflow. The local relay does not require OpenAI, Codex, Gemini, Google, or GitHub Actions API secrets.
+
+Repo memory is the source of truth. Chat memory is not required for task continuity because each non-interactive run rebuilds context from `AGENTS.md`, `docs/`, `adr/`, `.agent/state/`, latest reports, and the current Git diff.
+
+The user still controls final review and merge. Agents may push only the current `feat/*` branch; they must not push `main`, merge `beta`, force push, or rewrite history.
+
 ## Branch Model
 
 ### `main`
@@ -69,6 +84,40 @@ Gemini QA does not approve merges by itself. QA output is advisory until reviewe
 - Documentation-only tasks should not change runtime behavior.
 - Unclear or conflicting QA feedback should be recorded as an open question instead of silently implemented.
 
+## Commit Messages
+
+Future commits should use:
+
+```text
+type(scope): message
+```
+
+Examples:
+
+```text
+chore(repo): add multi-agent workflow
+docs(workflow): clarify qa handoff process
+fix(tests): use python3 for local test runner
+```
+
+## Clipboard Handoff Convention
+
+The source of truth for any next-agent prompt must always be a file, not only the clipboard.
+
+Write next-agent prompts to:
+
+```text
+.agent/reports/next-prompt-<agent>-<TASK-ID>.txt
+```
+
+If a clipboard utility is available, agents may also copy the prompt to the clipboard. Clipboard availability must not be required for task success.
+
+On Linux, accepted clipboard utilities include:
+
+- `wl-copy`
+- `xclip`
+- `xsel`
+
 ## Required Handoff Report Format
 
 Each Builder task must create a report at:
@@ -109,6 +158,10 @@ Use this format:
 ## Next Task Suggestion
 
 - <One concrete next task.>
+
+## Next-Agent Prompt
+
+- <Path to `.agent/reports/next-prompt-<agent>-<TASK-ID>.txt`, if follow-up QA or Builder work is needed.>
 ```
 
 Reports must not contain secrets, API keys, customer credentials, cookies, or private tokens.

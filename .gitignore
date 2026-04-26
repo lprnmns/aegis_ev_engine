@@ -21,6 +21,10 @@ src-tauri/target/
 
 # Agent scratch space
 .agent/tmp/
+.agent/state/*
+!.agent/state/README.md
+!.agent/state/project-memory.md
+!.agent/state/current-task.json
 
 # OS/IDE
 .DS_Store
