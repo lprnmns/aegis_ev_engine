@@ -1,12 +1,12 @@
 {
-  "task_id": "TASK-006-report-generator-markdown-json",
-  "branch": "feat/TASK-006-report-generator-markdown-json",
+  "task_id": "TASK-007-engine-cli-api-contract",
+  "branch": "feat/TASK-007-engine-cli-api-contract",
   "base_branch": "beta",
-  "status": "passed",
+  "status": "in_progress",
   "loop_count": 0,
   "max_loops": 1,
   "last_codex_commit": null,
-  "last_gemini_verdict": "PASS",
-  "next_actor": "done",
+  "last_gemini_verdict": null,
+  "next_actor": "gemini",
   "blocked": false
 }

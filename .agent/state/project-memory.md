@@ -43,7 +43,7 @@ Aegis EV uses a local-first architecture:
 
 ## Current Task
 
-TASK-006 report generator Markdown JSON.
+TASK-007 engine CLI API contract.
 
 ## Open Decisions
 
@@ -62,3 +62,4 @@ TASK-006 report generator Markdown JSON.
 - TASK-004B records the project-wide local development/testing auth decision: use account-authenticated local Codex/Gemini CLIs, not API keys.
 - TASK-005 adds evidence and finding models, deterministic evidence hashes, secret-safe serialization, conservative finding verification defaults, and in-memory/JSON/JSONL evidence store primitives.
 - TASK-006 adds deterministic JSON and Markdown report generation from evidence, findings, audit verification metadata, and project scope without PDF, UI, AI prose, scanner integration, or network side effects.
+- TASK-007 adds a deterministic JSON CLI/API contract for policy validation, dry-run adapter planning, report rendering, and audit verification for future Tauri sidecar integration.
