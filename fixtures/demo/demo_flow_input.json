@@ -1,0 +1,5 @@
+{
+  "fixture_dir": "fixtures/demo",
+  "write_outputs": false,
+  "no_network": true
+}

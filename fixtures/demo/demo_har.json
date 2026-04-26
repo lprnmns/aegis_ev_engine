@@ -1,0 +1,35 @@
+{
+  "log": {
+    "version": "1.2",
+    "creator": {
+      "name": "Aegis EV Fixture",
+      "version": "1.0"
+    },
+    "entries": [
+      {
+        "request": {
+          "method": "GET",
+          "url": "https://portfolio.example.test/account?session=not-a-real-demo-session-1234567890",
+          "headers": [
+            {
+              "name": "Authorization",
+              "value": "Bearer not-a-real-demo-token-1234567890"
+            }
+          ],
+          "cookies": [
+            {
+              "name": "sessionid",
+              "value": "not-a-real-demo-session-1234567890"
+            }
+          ],
+          "queryString": [
+            {
+              "name": "session",
+              "value": "not-a-real-demo-session-1234567890"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

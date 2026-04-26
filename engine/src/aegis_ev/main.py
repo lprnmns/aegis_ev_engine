@@ -32,6 +32,8 @@ MACHINE_COMMANDS = (
     "update-session-status",
     "validate-project-target",
     "link-project-reference",
+    "run-demo-flow",
+    "demo-flow",
 )
 
 

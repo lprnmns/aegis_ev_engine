@@ -23,6 +23,7 @@ from .checks.web_headers import (
     evidence_from_web_header_check,
     finding_from_web_header_check,
 )
+from .demo_flow import run_demo_flow_from_payload
 from .evidence import EvidenceRecord, EvidenceStore, FindingRecord
 from .imports import evidence_from_import_result, import_har, import_openapi, import_postman
 from .models import AuthorizationProfile, ImpactLevel, PolicyBudget, RequestBudget, ToolIntent
@@ -180,6 +181,8 @@ def run_contract_command(command: str, payload: dict[str, Any]) -> CommandRespon
             return validate_project_target(payload)
         if command == "link-project-reference":
             return link_project_reference(payload)
+        if command in {"run-demo-flow", "demo-flow"}:
+            return run_demo_flow_command(payload, command=command)
         return failure(command, "unsupported_command", f"Unsupported command: {command}")
     except (KeyError, TypeError, ValueError) as exc:
         return failure(command, "invalid_request", str(exc))
@@ -573,6 +576,11 @@ def link_project_reference(payload: dict[str, Any]) -> CommandResponse:
         raise ValueError("reference_type must be import, evidence, finding, or report")
     _export_workspace_if_configured(store, store_path)
     return success("link-project-reference", {"project": project.to_dict()})
+
+
+def run_demo_flow_command(payload: dict[str, Any], *, command: str = "run-demo-flow") -> CommandResponse:
+    result = run_demo_flow_from_payload(payload)
+    return success(command, {"demo": result.to_dict()}, warnings=list(result.warnings))
 
 
 def verify_audit(payload: dict[str, Any]) -> CommandResponse:
