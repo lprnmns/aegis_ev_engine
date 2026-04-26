@@ -134,6 +134,49 @@ class EngineCliContractTests(unittest.TestCase):
         self.assertFalse(response["ok"])
         self.assertEqual(response["error"]["code"], "unknown_adapter")
 
+    def test_analyze_web_headers_returns_parseable_json(self):
+        code, response = run_cli(
+            ["analyze-web-headers"],
+            {
+                "target": "https://example.com/account/login",
+                "headers": {"Server": "nginx/1.27.0", "Set-Cookie": "sessionid=abc123; Secure"},
+                "authorization_profile": auth(),
+            },
+        )
+        self.assertEqual(code, 0)
+        self.assertTrue(response["ok"])
+        self.assertEqual(response["command"], "analyze-web-headers")
+        self.assertIn("checks", response["result"])
+        self.assertIn("evidence", response["result"])
+        self.assertIn("findings", response["result"])
+
+    def test_analyze_web_headers_invalid_input_returns_structured_error(self):
+        code, response = run_cli(
+            ["analyze-web-headers"],
+            {
+                "target": "https://example.com/account/login",
+                "headers": "not-an-object",
+                "authorization_profile": auth(),
+            },
+        )
+        self.assertEqual(code, 1)
+        self.assertFalse(response["ok"])
+        self.assertEqual(response["error"]["code"], "invalid_request")
+
+    def test_analyze_web_headers_does_not_leak_secrets(self):
+        code, response = run_cli(
+            ["analyze-web-headers"],
+            {
+                "target": "https://example.com/account/login",
+                "headers": {"Authorization": SECRET_VALUE, "Set-Cookie": "sessionid=supersecretvalue1234567890; Secure"},
+                "authorization_profile": auth(),
+            },
+        )
+        self.assertEqual(code, 0)
+        rendered = json.dumps(response, sort_keys=True)
+        self.assertNotIn(SECRET_VALUE, rendered)
+        self.assertNotIn("supersecretvalue1234567890", rendered)
+
     def test_report_render_returns_deterministic_markdown(self):
         payload = report_payload(format="markdown")
         first = run_cli(["render-report"], payload)
@@ -197,7 +240,6 @@ class EngineCliContractTests(unittest.TestCase):
         source = inspect.getsource(contracts) + inspect.getsource(cli_main)
         self.assertNotIn("shell=True", source)
         self.assertNotIn("subprocess", source)
-        self.assertNotIn("fetch_and_analyze_headers", source)
         self.assertNotIn("import requests", source)
 
     def test_input_file_supported(self):

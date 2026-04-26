@@ -110,6 +110,10 @@ class SafeToolAdapter:
                 return False, f"Argument '{key}' must be a boolean"
             if expected == "float" and not isinstance(value, (int, float)):
                 return False, f"Argument '{key}' must be a number"
+            if expected == "object" and not isinstance(value, dict):
+                return False, f"Argument '{key}' must be an object"
+            if expected == "list" and not isinstance(value, list):
+                return False, f"Argument '{key}' must be a list"
         return True, None
 
     def command_preview(self, request: ToolActionRequest) -> list[str]:
@@ -141,6 +145,30 @@ class EchoPlanAdapter(SafeToolAdapter):
 
     def execution_preview(self, request: ToolActionRequest, sanitized_arguments: dict[str, Any]) -> str:
         return f"Echo dry-run preview: {sanitized_arguments['message']}"
+
+
+class WebHeaderConfigCheckAdapter(SafeToolAdapter):
+    """Deterministic supplied-data analyzer with no network side effects."""
+
+    metadata = AdapterMetadata(
+        adapter_id="web_header_config_check",
+        display_name="Web Header Config Check Adapter",
+        description="Analyzes supplied HTTP header and configuration metadata without network access.",
+        supported_actions=("analyze_headers",),
+        default_impact_level=ImpactLevel.GREEN,
+        requires_network=False,
+        requires_authentication=False,
+        allowed_target_types=("url",),
+        allowed_argument_schema={"headers": "object"},
+        timeout_seconds=5,
+        max_requests=1,
+        max_concurrency=1,
+        produces_evidence=True,
+        safe_mode_supported=True,
+    )
+
+    def execution_preview(self, request: ToolActionRequest, sanitized_arguments: dict[str, Any]) -> str:
+        return "Analyze supplied HTTP headers and configuration locally without network access."
 
 
 @dataclass
@@ -323,6 +351,7 @@ class AdapterPlanner:
 def default_registry() -> AdapterRegistry:
     registry = AdapterRegistry()
     registry.register(EchoPlanAdapter())
+    registry.register(WebHeaderConfigCheckAdapter())
     return registry
 
 

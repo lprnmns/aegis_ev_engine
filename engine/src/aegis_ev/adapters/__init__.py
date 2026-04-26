@@ -10,6 +10,7 @@ from .framework import (
     ToolActionPlan,
     ToolActionRequest,
     UnknownAdapterError,
+    WebHeaderConfigCheckAdapter,
     default_registry,
 )
 
@@ -23,5 +24,6 @@ __all__ = [
     "ToolActionPlan",
     "ToolActionRequest",
     "UnknownAdapterError",
+    "WebHeaderConfigCheckAdapter",
     "default_registry",
 ]

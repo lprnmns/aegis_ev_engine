@@ -9,6 +9,7 @@ from .contracts import failure, load_json_input, run_contract_command
 MACHINE_COMMANDS = (
     "validate-policy",
     "plan-adapter",
+    "analyze-web-headers",
     "render-report",
     "verify-audit",
     "create-approval",

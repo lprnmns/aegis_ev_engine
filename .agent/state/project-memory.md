@@ -43,7 +43,7 @@ Aegis EV uses a local-first architecture:
 
 ## Current Task
 
-TASK-008 approval queue human in the loop.
+TASK-009 safe web header config checks.
 
 ## Open Decisions
 
@@ -64,3 +64,4 @@ TASK-008 approval queue human in the loop.
 - TASK-006 adds deterministic JSON and Markdown report generation from evidence, findings, audit verification metadata, and project scope without PDF, UI, AI prose, scanner integration, or network side effects.
 - TASK-007 adds a deterministic JSON CLI/API contract for policy validation, dry-run adapter planning, report rendering, and audit verification for future Tauri sidecar integration.
 - TASK-008 adds a local approval queue and HITL lifecycle for policy/adapters, plus approval-aware audit, evidence, and CLI contract commands.
+- TASK-009 adds deterministic supplied-data web header and configuration analysis with secret-safe evidence, candidate findings, and no live network requests.
