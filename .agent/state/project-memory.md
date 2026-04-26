@@ -40,7 +40,7 @@ Aegis EV uses a local-first architecture:
 
 ## Current Task
 
-TASK-002 policy core hardening.
+TASK-003 audit log durability.
 
 ## Open Decisions
 
@@ -54,3 +54,4 @@ TASK-002 policy core hardening.
 - TASK-001C is adding a local file-based Codex/Gemini relay with repo memory and local CLI orchestration.
 - TASK-002 hardens the deterministic policy core before additional AI or tool execution features.
 - Policy decisions now emphasize explicit authorization windows, scoped targets, impact levels, approvals, budgets, and audit-safe serialization.
+- TASK-003 hardens audit log durability with structured events, deterministic hashes, verification results, and secret redaction.
