@@ -23,6 +23,7 @@ src-tauri/target/
 
 # Agent scratch space
 .agent/tmp/
+**/.agent/tmp/
 .agent/state/*
 !.agent/state/README.md
 !.agent/state/project-memory.md
