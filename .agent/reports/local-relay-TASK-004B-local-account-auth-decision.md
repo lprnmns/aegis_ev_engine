@@ -1,3 +1,10 @@
+# Local Relay Report: TASK-004B-local-account-auth-decision
+
+Updated: 2026-04-26T15:29:18.797320+00:00
+
+## State
+
+```json
 {
   "task_id": "TASK-004B-local-account-auth-decision",
   "branch": "feat/TASK-004B-local-account-auth-decision",
@@ -10,3 +17,8 @@
   "next_actor": "done",
   "blocked": false
 }
+```
+
+## Events
+
+- Gemini verdict: `PASS`.

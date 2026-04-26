@@ -28,6 +28,9 @@ Reconstruct context from repository files:
 ## Safety Boundaries
 
 - Do not touch credentials, credential stores, keyrings, browser cookies, `~/.codex/`, or `~/.gemini/`.
+- Do not request API keys for local development, local testing, local relay runs, or local QA.
+- Use local account-authenticated Codex/Gemini CLIs for local relay work.
+- Treat API key/BYOK support as future production/customer-provider scope only when explicitly tasked.
 - Do not propose stealth, ban bypass, proxy rotation for evasion, browser session scraping, raw LLM shell execution, unauthorized scanning behavior, credential attacks, or direct pushes to `main`.
 - Do not broaden the task into product features.
 

@@ -19,6 +19,9 @@ Phase 1 is Modern Web/API validation only.
 - No credential attacks, brute force, password spraying, or session hijacking.
 - No direct push to `main`.
 - No automatic merge into `beta`.
+- Local development/testing uses account-authenticated Codex CLI and Gemini CLI, not API keys.
+- API key/BYOK support is future production/customer-provider scope only.
+- Never inspect or commit CLI auth files, browser/session credentials, cookies, tokens, keyrings, auth caches, or credential stores.
 
 ## Architecture Summary
 
@@ -40,7 +43,7 @@ Aegis EV uses a local-first architecture:
 
 ## Current Task
 
-TASK-004 safe tool adapter framework.
+TASK-004B local account authentication decision.
 
 ## Open Decisions
 
@@ -56,3 +59,4 @@ TASK-004 safe tool adapter framework.
 - Policy decisions now emphasize explicit authorization windows, scoped targets, impact levels, approvals, budgets, and audit-safe serialization.
 - TASK-003 hardens audit log durability with structured events, deterministic hashes, verification results, and secret redaction.
 - TASK-004 adds a planning-only safe adapter framework with structured requests, registry, policy/audit integration, and no real scanner execution.
+- TASK-004B records the project-wide local development/testing auth decision: use account-authenticated local Codex/Gemini CLIs, not API keys.

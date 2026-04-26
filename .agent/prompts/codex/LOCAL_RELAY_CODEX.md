@@ -33,6 +33,9 @@ Reconstruct context from repository files before changing anything:
 - Do not merge `beta`.
 - Do not force push.
 - Do not touch credentials, credential stores, keyrings, browser cookies, `~/.codex/`, or `~/.gemini/`.
+- Do not request API keys for local development, local testing, local relay runs, or local QA.
+- Use local account-authenticated Codex/Gemini CLIs for local relay work.
+- Treat API key/BYOK support as future production/customer-provider scope only when explicitly tasked.
 - Do not introduce unauthorized scanning, stealth, ban bypass, proxy rotation for evasion, browser session scraping, raw LLM shell execution, credential attacks, or offensive automation.
 - Preserve the defensive-only product posture.
 
