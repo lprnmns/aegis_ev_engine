@@ -18,6 +18,7 @@ class EvidenceType(str, Enum):
     ADAPTER_PLAN = "adapter_plan"
     ADAPTER_OUTPUT = "adapter_output"
     AUDIT_EVENT = "audit_event"
+    APPROVAL_EVENT = "approval_event"
     MANUAL_NOTE = "manual_note"
     SCREENSHOT_REFERENCE = "screenshot_reference"
     REQUEST_RESPONSE_REFERENCE = "request_response_reference"

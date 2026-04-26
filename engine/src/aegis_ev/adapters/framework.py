@@ -80,6 +80,8 @@ class ToolActionPlan:
     audit_event_id: str | None
     command_preview: list[str]
     execution_preview: str
+    approval_id: str | None = None
+    approval_status: str | None = None
     denial_reason: str | None = None
     decision_code: str = "allowed"
     dry_run: bool = True
@@ -308,6 +310,8 @@ class AdapterPlanner:
             required_approval=policy_decision.required_approval,
             estimated_budget=estimated_budget,
             audit_event_id=audit_event_id,
+            approval_id=request.approval_token,
+            approval_status="approved" if request.approval_token else ("required" if policy_decision.required_approval else None),
             command_preview=command_preview,
             execution_preview=execution_preview,
             denial_reason=denial_reason,
