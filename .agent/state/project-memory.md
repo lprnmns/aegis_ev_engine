@@ -43,7 +43,7 @@ Aegis EV uses a local-first architecture:
 
 ## Current Task
 
-TASK-004B local account authentication decision.
+TASK-005 evidence store and finding model.
 
 ## Open Decisions
 
@@ -60,3 +60,4 @@ TASK-004B local account authentication decision.
 - TASK-003 hardens audit log durability with structured events, deterministic hashes, verification results, and secret redaction.
 - TASK-004 adds a planning-only safe adapter framework with structured requests, registry, policy/audit integration, and no real scanner execution.
 - TASK-004B records the project-wide local development/testing auth decision: use account-authenticated local Codex/Gemini CLIs, not API keys.
+- TASK-005 adds evidence and finding models, deterministic evidence hashes, secret-safe serialization, conservative finding verification defaults, and in-memory/JSON/JSONL evidence store primitives.

@@ -1,12 +1,12 @@
 {
-  "task_id": "TASK-004B-local-account-auth-decision",
-  "branch": "feat/TASK-004B-local-account-auth-decision",
+  "task_id": "TASK-005-evidence-store-and-finding-model",
+  "branch": "feat/TASK-005-evidence-store-and-finding-model",
   "base_branch": "beta",
-  "status": "passed",
+  "status": "in_progress",
   "loop_count": 0,
   "max_loops": 1,
   "last_codex_commit": null,
-  "last_gemini_verdict": "PASS",
-  "next_actor": "done",
+  "last_gemini_verdict": null,
+  "next_actor": "gemini",
   "blocked": false
 }
