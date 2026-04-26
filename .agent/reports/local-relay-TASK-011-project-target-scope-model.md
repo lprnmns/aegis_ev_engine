@@ -1,3 +1,10 @@
+# Local Relay Report: TASK-011-project-target-scope-model
+
+Updated: 2026-04-26T20:06:43.861680+00:00
+
+## State
+
+```json
 {
   "task_id": "TASK-011-project-target-scope-model",
   "branch": "feat/TASK-011-project-target-scope-model",
@@ -10,3 +17,8 @@
   "next_actor": "done",
   "blocked": false
 }
+```
+
+## Events
+
+- Gemini verdict: `PASS`.
