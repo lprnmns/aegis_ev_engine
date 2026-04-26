@@ -8,6 +8,7 @@ from pathlib import Path
 from aegis_ev.adapters import (
     AdapterPlanner,
     AdapterRegistry,
+    ApiImportAdapter,
     DuplicateAdapterError,
     EchoPlanAdapter,
     ToolActionRequest,
@@ -189,7 +190,7 @@ class AdapterFrameworkTests(unittest.TestCase):
 
     def test_registry_list_behavior(self):
         adapters = default_registry().list_adapters()
-        self.assertEqual([adapter.adapter_id for adapter in adapters], ["echo_plan", "web_header_config_check"])
+        self.assertEqual([adapter.adapter_id for adapter in adapters], ["api_import", "echo_plan", "web_header_config_check"])
 
     def test_no_network_side_effects(self):
         plan = AdapterPlanner(default_registry()).plan(request())
@@ -225,6 +226,27 @@ class AdapterFrameworkTests(unittest.TestCase):
         self.assertTrue(plan.allowed)
         self.assertEqual(plan.adapter_id, "web_header_config_check")
         self.assertEqual(plan.execution_preview, "Analyze supplied HTTP headers and configuration locally without network access.")
+
+    def test_api_import_adapter_registered_and_safe(self):
+        adapter = default_registry().get("api_import")
+        self.assertIsInstance(adapter, ApiImportAdapter)
+        self.assertFalse(adapter.metadata.requires_network)
+        self.assertTrue(adapter.metadata.safe_mode_supported)
+        self.assertEqual(adapter.metadata.default_impact_level, ImpactLevel.GREEN)
+
+    def test_api_import_adapter_rejects_unsupported_action(self):
+        plan = AdapterPlanner(default_registry()).plan(
+            request(adapter_id="api_import", action="fetch_openapi", arguments={"data": {}})
+        )
+        self.assertFalse(plan.allowed)
+        self.assertEqual(plan.decision_code, "unsupported_action")
+
+    def test_api_import_adapter_rejects_invalid_input(self):
+        plan = AdapterPlanner(default_registry()).plan(
+            request(adapter_id="api_import", action="import_openapi", arguments={"data": "not-object"})
+        )
+        self.assertFalse(plan.allowed)
+        self.assertEqual(plan.decision_code, "invalid_arguments")
 
 
 if __name__ == "__main__":

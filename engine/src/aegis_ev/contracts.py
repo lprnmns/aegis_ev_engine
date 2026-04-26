@@ -24,6 +24,7 @@ from .checks.web_headers import (
     finding_from_web_header_check,
 )
 from .evidence import EvidenceRecord, EvidenceStore, FindingRecord
+from .imports import evidence_from_import_result, import_har, import_openapi, import_postman
 from .models import AuthorizationProfile, ImpactLevel, PolicyBudget, RequestBudget, ToolIntent
 from .policy import PolicyEngine
 from .reporting import create_report, render_report_json, render_report_markdown
@@ -131,6 +132,12 @@ def run_contract_command(command: str, payload: dict[str, Any]) -> CommandRespon
             return verify_audit(payload)
         if command == "analyze-web-headers":
             return analyze_web_headers_command(payload)
+        if command == "import-openapi":
+            return import_openapi_command(payload)
+        if command == "import-postman":
+            return import_postman_command(payload)
+        if command == "import-har":
+            return import_har_command(payload)
         if command == "create-approval":
             return create_approval(payload)
         if command == "list-approvals":
@@ -371,6 +378,79 @@ def analyze_web_headers_command(payload: dict[str, Any]) -> CommandResponse:
     result["evidence"] = [item.to_dict() for item in evidence_records]
     result["findings"] = [item.to_dict() for item in finding_records]
     return success("analyze-web-headers", result, warnings=warnings)
+
+
+def import_openapi_command(payload: dict[str, Any]) -> CommandResponse:
+    return _import_api_description(
+        command="import-openapi",
+        payload=payload,
+        importer=import_openapi,
+        adapter_action="import_openapi",
+    )
+
+
+def import_postman_command(payload: dict[str, Any]) -> CommandResponse:
+    return _import_api_description(
+        command="import-postman",
+        payload=payload,
+        importer=import_postman,
+        adapter_action="import_postman",
+    )
+
+
+def import_har_command(payload: dict[str, Any]) -> CommandResponse:
+    return _import_api_description(
+        command="import-har",
+        payload=payload,
+        importer=import_har,
+        adapter_action="import_har",
+    )
+
+
+def _import_api_description(command: str, payload: dict[str, Any], importer: Any, adapter_action: str) -> CommandResponse:
+    source_name = payload.get("source_name")
+    now = _optional_datetime(payload.get("now"))
+    data = _required_dict(payload, "data")
+    warnings: list[str] = []
+    plan_payload = payload.get("authorization_profile")
+    plan_dict = None
+    if plan_payload is not None:
+        target = str(payload.get("target", "https://example.com"))
+        request = ToolActionRequest(
+            action_id=str(payload.get("action_id", command.replace("-", "_"))),
+            adapter_id="api_import",
+            target=target,
+            action=adapter_action,
+            arguments={"data": data},
+            requested_impact_level=payload.get("requested_impact_level", ImpactLevel.GREEN.value),
+            actor=str(payload.get("actor", "contract")),
+            authorization_profile=_authorization_profile(_required_dict(payload, "authorization_profile")),
+            dry_run=bool(payload.get("dry_run", True)),
+            requests_used=int(payload.get("requests_used", 0)),
+        )
+        try:
+            plan = AdapterPlanner(default_registry()).plan(request)
+        except UnknownAdapterError as exc:
+            return failure(command, "unknown_adapter", str(exc))
+        plan_dict = _plan_dict(plan)
+        if not plan.allowed:
+            return success(command, {"plan": plan_dict, "import_result": None, "evidence": None}, warnings=warnings)
+
+    result = importer(data, source_name=source_name, now=now)
+    evidence = evidence_from_import_result(result)
+    result_payload = result.to_dict()
+    result_payload["evidence_ids"] = [evidence.evidence_id]
+    response = {
+        "import_result": result_payload,
+        "endpoint_count": result.endpoint_count,
+        "evidence": evidence.to_dict(),
+    }
+    if plan_dict is not None:
+        response["plan"] = plan_dict
+    warnings.extend(result.warnings)
+    if result.errors:
+        return failure(command, "invalid_import", "; ".join(result.errors), details=response, warnings=warnings)
+    return success(command, response, warnings=warnings)
 
 
 def verify_audit(payload: dict[str, Any]) -> CommandResponse:
@@ -682,25 +762,3 @@ def _consume_store_approval(
         store._items[approval.approval_id] = approval
     store.export_json(Path(store_path))
     return approval
-
-# Import API import commands module
-from .contracts_api_imports import (
-    import_openapi_command,
-    import_postman_command,
-    import_har_command
-)
-
-# Add API import commands to run_contract_command
-original_run_contract_command = run_contract_command
-
-def run_contract_command(command: str, payload: dict[str, Any]) -> CommandResponse:
-    # Handle API import commands
-    if command == "import-openapi":
-        return import_openapi_command(payload)
-    if command == "import-postman":
-        return import_postman_command(payload)
-    if command == "import-har":
-        return import_har_command(payload)
-    
-    # Call original function for other commands
-    return original_run_contract_command(command, payload)

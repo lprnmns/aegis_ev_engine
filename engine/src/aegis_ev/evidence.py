@@ -29,6 +29,7 @@ class EvidenceSourceType(str, Enum):
     POLICY = "policy"
     ADAPTER = "adapter"
     WEB_HEADER_CHECK = "web_header_check"
+    API_IMPORT = "api_import"
     AUDIT = "audit"
     HUMAN = "human"
     AI_VERIFIER = "ai_verifier"

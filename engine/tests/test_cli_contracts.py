@@ -177,6 +177,60 @@ class EngineCliContractTests(unittest.TestCase):
         self.assertNotIn(SECRET_VALUE, rendered)
         self.assertNotIn("supersecretvalue1234567890", rendered)
 
+    def test_cli_import_openapi_returns_parseable_json(self):
+        code, response = run_cli(
+            ["import-openapi"],
+            {
+                "source_name": "Example API",
+                "data": {
+                    "openapi": "3.0.3",
+                    "info": {"title": "Example API", "version": "1.0.0"},
+                    "paths": {"/users": {"get": {"summary": "List users", "responses": {"200": {"description": "OK"}}}}},
+                },
+            },
+        )
+        self.assertEqual(code, 0)
+        self.assertTrue(response["ok"])
+        self.assertEqual(response["result"]["endpoint_count"], 1)
+
+    def test_cli_import_postman_returns_parseable_json(self):
+        code, response = run_cli(
+            ["import-postman"],
+            {
+                "data": {
+                    "info": {"name": "Example Postman"},
+                    "item": [{"name": "Users", "request": {"method": "GET", "url": {"raw": "https://example.com/users"}}}],
+                },
+            },
+        )
+        self.assertEqual(code, 0)
+        self.assertTrue(response["ok"])
+        self.assertEqual(response["result"]["endpoint_count"], 1)
+
+    def test_cli_import_har_returns_parseable_json(self):
+        code, response = run_cli(
+            ["import-har"],
+            {
+                "data": {
+                    "log": {
+                        "entries": [
+                            {"request": {"method": "GET", "url": "https://example.com/account?token=" + SECRET_VALUE}}
+                        ]
+                    }
+                },
+            },
+        )
+        self.assertEqual(code, 0)
+        self.assertTrue(response["ok"])
+        self.assertEqual(response["result"]["endpoint_count"], 1)
+        self.assertNotIn(SECRET_VALUE, json.dumps(response, sort_keys=True))
+
+    def test_cli_import_invalid_input_returns_structured_error(self):
+        code, response = run_cli(["import-openapi"], {"data": {"openapi": "3.0.3"}})
+        self.assertEqual(code, 1)
+        self.assertFalse(response["ok"])
+        self.assertEqual(response["error"]["code"], "invalid_import")
+
     def test_report_render_returns_deterministic_markdown(self):
         payload = report_payload(format="markdown")
         first = run_cli(["render-report"], payload)
