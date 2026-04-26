@@ -26,6 +26,13 @@
 - `python3 scripts/local_agent_relay.py --task-id TASK-004-safe-tool-adapter-framework --dry-run --once` - passed.
 - `bash scripts/check_agent_relay_prereqs.sh` - passed; found `codex`, `gemini`, `git`, nvm Node `v24.15.0`, npm `11.12.1`, and ran tests.
 
+## Gemini QA
+
+- `python3 scripts/local_agent_relay.py --task-id TASK-004-safe-tool-adapter-framework --once --max-loops 1` - completed.
+- Gemini verdict: `PASS`.
+- Codex follow-up path was not invoked because the Gemini verdict was `PASS`.
+- No required fixes were reported.
+
 ## Security Posture
 
 - Runtime security posture is not more permissive.
