@@ -7,7 +7,7 @@ class SafeHeadersTests(unittest.TestCase):
     def test_analyze_headers_reports_missing_security_headers(self):
         result = analyze_headers("https://example.com", 200, {"Server": "test"})
         titles = [finding.title for finding in result.findings]
-        self.assertTrue(any("content-security-policy" in title for title in titles))
+        self.assertTrue(any("Content-Security-Policy" in title for title in titles))
         self.assertEqual(result.evidence.data["status_code"], 200)
 
     def test_analyze_headers_accepts_present_headers_case_insensitive(self):

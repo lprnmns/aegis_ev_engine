@@ -12,6 +12,7 @@ from aegis_ev.adapters import (
     EchoPlanAdapter,
     ToolActionRequest,
     UnknownAdapterError,
+    WebHeaderConfigCheckAdapter,
     default_registry,
 )
 from aegis_ev.audit import AuditLog, REDACTED
@@ -188,13 +189,42 @@ class AdapterFrameworkTests(unittest.TestCase):
 
     def test_registry_list_behavior(self):
         adapters = default_registry().list_adapters()
-        self.assertEqual([adapter.adapter_id for adapter in adapters], ["echo_plan"])
+        self.assertEqual([adapter.adapter_id for adapter in adapters], ["echo_plan", "web_header_config_check"])
 
     def test_no_network_side_effects(self):
         plan = AdapterPlanner(default_registry()).plan(request())
         self.assertTrue(plan.allowed)
         self.assertFalse(default_registry().get("echo_plan").metadata.requires_network)
         self.assertEqual(plan.estimated_budget["max_requests"], 1)
+
+    def test_web_header_adapter_registered_and_safe(self):
+        adapter = default_registry().get("web_header_config_check")
+        self.assertIsInstance(adapter, WebHeaderConfigCheckAdapter)
+        self.assertFalse(adapter.metadata.requires_network)
+        self.assertTrue(adapter.metadata.safe_mode_supported)
+
+    def test_web_header_adapter_rejects_invalid_arguments(self):
+        plan = AdapterPlanner(default_registry()).plan(
+            request(
+                adapter_id="web_header_config_check",
+                action="analyze_headers",
+                arguments={"headers": "not-an-object"},
+            )
+        )
+        self.assertFalse(plan.allowed)
+        self.assertEqual(plan.decision_code, "invalid_arguments")
+
+    def test_web_header_adapter_allows_valid_arguments(self):
+        plan = AdapterPlanner(default_registry()).plan(
+            request(
+                adapter_id="web_header_config_check",
+                action="analyze_headers",
+                arguments={"headers": {"server": "nginx"}},
+            )
+        )
+        self.assertTrue(plan.allowed)
+        self.assertEqual(plan.adapter_id, "web_header_config_check")
+        self.assertEqual(plan.execution_preview, "Analyze supplied HTTP headers and configuration locally without network access.")
 
 
 if __name__ == "__main__":

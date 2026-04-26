@@ -17,6 +17,12 @@ from .approvals import (
     apply_approval_to_intent,
 )
 from .audit import AuditLog, AuditVerificationResult, canonical_json, redact_value
+from .checks.web_headers import (
+    WebHeaderAnalysisInput,
+    analyze_web_headers,
+    evidence_from_web_header_check,
+    finding_from_web_header_check,
+)
 from .evidence import EvidenceRecord, EvidenceStore, FindingRecord
 from .models import AuthorizationProfile, ImpactLevel, PolicyBudget, RequestBudget, ToolIntent
 from .policy import PolicyEngine
@@ -123,6 +129,8 @@ def run_contract_command(command: str, payload: dict[str, Any]) -> CommandRespon
             return render_report(payload)
         if command == "verify-audit":
             return verify_audit(payload)
+        if command == "analyze-web-headers":
+            return analyze_web_headers_command(payload)
         if command == "create-approval":
             return create_approval(payload)
         if command == "list-approvals":
@@ -319,6 +327,52 @@ def render_report(payload: dict[str, Any]) -> CommandResponse:
     return success("render-report", {"format": output_format, "content": content})
 
 
+def analyze_web_headers_command(payload: dict[str, Any]) -> CommandResponse:
+    warnings: list[str] = []
+    authorization = _authorization_profile(_required_dict(payload, "authorization_profile"))
+    request = ToolActionRequest(
+        action_id=str(payload.get("action_id", "analyze_web_headers")),
+        adapter_id="web_header_config_check",
+        target=str(_required(payload, "target")),
+        action="analyze_headers",
+        arguments={"headers": _required_dict(payload, "headers")},
+        requested_impact_level=payload.get("requested_impact_level", ImpactLevel.GREEN.value),
+        actor=str(payload.get("actor", "contract")),
+        authorization_profile=authorization,
+        dry_run=bool(payload.get("dry_run", True)),
+        requests_used=int(payload.get("requests_used", 0)),
+    )
+    try:
+        plan = AdapterPlanner(default_registry()).plan(request)
+    except UnknownAdapterError as exc:
+        return failure("analyze-web-headers", "unknown_adapter", str(exc))
+
+    result: dict[str, Any] = {"plan": _plan_dict(plan), "checks": [], "evidence": [], "findings": []}
+    if not plan.allowed:
+        return success("analyze-web-headers", result, warnings=warnings)
+
+    analysis_input = WebHeaderAnalysisInput(
+        target=request.target,
+        normalized_target=plan.normalized_target,
+        status_code=payload.get("status_code"),
+        headers=_required_dict(payload, "headers"),
+        content_type=payload.get("content_type"),
+        protocol=payload.get("protocol"),
+        tls_summary=_mapping_or_none(payload.get("tls_summary")),
+        observed_redirects=tuple(payload.get("observed_redirects", [])),
+        source_reference=payload.get("source_reference"),
+        request_origin=payload.get("request_origin"),
+        security_txt_present=payload.get("security_txt_present"),
+    )
+    checks = analyze_web_headers(analysis_input)
+    evidence_records = [evidence_from_web_header_check(item, related_audit_event_id=plan.audit_event_id) for item in checks]
+    finding_records = [finding_from_web_header_check(item, evidence) for item, evidence in zip(checks, evidence_records, strict=True)]
+    result["checks"] = [item.to_dict() for item in checks]
+    result["evidence"] = [item.to_dict() for item in evidence_records]
+    result["findings"] = [item.to_dict() for item in finding_records]
+    return success("analyze-web-headers", result, warnings=warnings)
+
+
 def verify_audit(payload: dict[str, Any]) -> CommandResponse:
     audit_log = Path(str(_required(payload, "audit_log")))
     warnings: list[str] = []
@@ -508,6 +562,14 @@ def _dict_or_empty(value: Any) -> dict[str, Any]:
         return {}
     if not isinstance(value, dict):
         raise ValueError("arguments must be an object")
+    return value
+
+
+def _mapping_or_none(value: Any) -> dict[str, Any] | None:
+    if value is None:
+        return None
+    if not isinstance(value, dict):
+        raise ValueError("value must be an object")
     return value
 
 
