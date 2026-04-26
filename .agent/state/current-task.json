@@ -1,12 +1,12 @@
 {
-  "task_id": "TASK-002-policy-core-hardening",
-  "branch": "feat/TASK-002-policy-core-hardening",
+  "task_id": "TASK-003-audit-log-durability",
+  "branch": "feat/TASK-003-audit-log-durability",
   "base_branch": "beta",
-  "status": "passed",
+  "status": "in_progress",
   "loop_count": 0,
-  "max_loops": 1,
+  "max_loops": 3,
   "last_codex_commit": null,
-  "last_gemini_verdict": "PASS",
-  "next_actor": "done",
+  "last_gemini_verdict": null,
+  "next_actor": "gemini",
   "blocked": false
 }

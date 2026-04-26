@@ -42,12 +42,7 @@ def validate_command(args: argparse.Namespace) -> int:
     )
 
     decision = PolicyEngine().evaluate(intent, auth)
-    audit.append(
-        actor="system",
-        action=f"policy.{decision.decision.value}",
-        target=decision.normalized_target,
-        details=decision.to_audit_details(),
-    )
+    audit.append_policy_decision(decision, actor="system")
 
     if not decision.allowed:
         print(json.dumps({"decision": decision.decision.value, "reason": decision.reason}, indent=2))
@@ -59,6 +54,9 @@ def validate_command(args: argparse.Namespace) -> int:
         action="adapter.completed",
         target=args.target,
         details={"evidence_id": result.evidence.id, "finding_count": len(result.findings)},
+        event_type="adapter_event",
+        normalized_target=decision.normalized_target,
+        impact_level=ImpactLevel.GREEN.value,
     )
     print(json.dumps({
         "decision": decision.decision.value,
@@ -70,9 +68,15 @@ def validate_command(args: argparse.Namespace) -> int:
 
 def audit_verify_command(args: argparse.Namespace) -> int:
     audit = AuditLog(args.audit_log)
-    ok = audit.verify()
-    print(json.dumps({"audit_log": str(args.audit_log), "valid": ok}, indent=2))
-    return 0 if ok else 3
+    result = audit.verify()
+    print(json.dumps({
+        "audit_log": str(args.audit_log),
+        "valid": result.valid,
+        "event_count": result.event_count,
+        "last_hash": result.last_hash,
+        "errors": result.errors,
+    }, indent=2))
+    return 0 if result.valid else 3
 
 
 def build_parser() -> argparse.ArgumentParser:
