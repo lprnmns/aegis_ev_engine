@@ -43,7 +43,7 @@ Aegis EV uses a local-first architecture:
 
 ## Current Task
 
-TASK-005 evidence store and finding model.
+TASK-006 report generator Markdown JSON.
 
 ## Open Decisions
 
@@ -61,3 +61,4 @@ TASK-005 evidence store and finding model.
 - TASK-004 adds a planning-only safe adapter framework with structured requests, registry, policy/audit integration, and no real scanner execution.
 - TASK-004B records the project-wide local development/testing auth decision: use account-authenticated local Codex/Gemini CLIs, not API keys.
 - TASK-005 adds evidence and finding models, deterministic evidence hashes, secret-safe serialization, conservative finding verification defaults, and in-memory/JSON/JSONL evidence store primitives.
+- TASK-006 adds deterministic JSON and Markdown report generation from evidence, findings, audit verification metadata, and project scope without PDF, UI, AI prose, scanner integration, or network side effects.
