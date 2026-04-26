@@ -171,6 +171,30 @@ class WebHeaderConfigCheckAdapter(SafeToolAdapter):
         return "Analyze supplied HTTP headers and configuration locally without network access."
 
 
+class ApiImportAdapter(SafeToolAdapter):
+    """Planning-only adapter for supplied OpenAPI, Postman, and HAR JSON imports."""
+
+    metadata = AdapterMetadata(
+        adapter_id="api_import",
+        display_name="API Import Adapter",
+        description="Imports supplied API description JSON without fetching, replaying, or executing requests.",
+        supported_actions=("import_har", "import_openapi", "import_postman"),
+        default_impact_level=ImpactLevel.GREEN,
+        requires_network=False,
+        requires_authentication=False,
+        allowed_target_types=("url", "file"),
+        allowed_argument_schema={"data": "object"},
+        timeout_seconds=5,
+        max_requests=1,
+        max_concurrency=1,
+        produces_evidence=True,
+        safe_mode_supported=True,
+    )
+
+    def execution_preview(self, request: ToolActionRequest, sanitized_arguments: dict[str, Any]) -> str:
+        return f"Import supplied {request.action.removeprefix('import_')} JSON locally without network access."
+
+
 @dataclass
 class AdapterRegistry:
     _adapters: dict[str, SafeToolAdapter] = field(default_factory=dict)
@@ -350,6 +374,7 @@ class AdapterPlanner:
 
 def default_registry() -> AdapterRegistry:
     registry = AdapterRegistry()
+    registry.register(ApiImportAdapter())
     registry.register(EchoPlanAdapter())
     registry.register(WebHeaderConfigCheckAdapter())
     return registry

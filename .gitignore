@@ -11,6 +11,7 @@ __pycache__/
 .env
 .env.*
 !.env.example
+litellm_config.yaml
 
 # Node/Tauri later
 node_modules/

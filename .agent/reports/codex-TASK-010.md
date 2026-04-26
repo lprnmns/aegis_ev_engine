@@ -1,53 +1,64 @@
-# Codex Handoff Report: TASK-010 API Import Foundation
+# Codex Report: TASK-010 GPT Audit and Repair
 
-## Summary
+## Task
 
-- Added API import foundation for OpenAPI/Postman/HAR files
-- Implemented safe import/parsing/normalization functionality
-- No live network requests, no unauthorized scanning
-- No remote fetching, no HAR replay, no Postman script execution
-- Added safe redaction for sensitive data
-- Added evidence integration for imported data
+TASK-010-GPT-audit-and-repair-qwen-output
 
-## Files Changed
+## Branch
 
-- `engine/src/aegis_ev/imports/api_import.py` - API import foundation module
-- `engine/src/aegis_ev/imports/__init__.py` - API import package init
-- `engine/src/aegis_ev/adapters/api_import_adapter.py` - API import adapter
-- `engine/src/aegis_ev/contracts_api_imports.py` - API import contract commands
-- `engine/src/aegis_ev/contracts.py` - Updated contract commands
-- `engine/tests/test_api_import.py` - API import tests
-- `docs/26_API_IMPORT_FOUNDATION.md` - API import documentation
-- `.agent/state/current-task.json` - Updated task state
-- `.agent/state/project-memory.md` - Updated project memory
+`feat/TASK-010-gpt-audit-repair`
 
-## Tests Run
+## Bad Commit Identified
 
-- Targeted engine tests for the new module passed:
-  - `cd engine && PYTHONPATH=src python3 -m unittest tests.test_api_import`
-  
-Full validation and relay QA results will be updated below after execution.
+- `789cdb400c90184505dc927848340f07f65e6996` (`feat(import): add api import foundation`) was found directly on `beta` after TASK-009 merge commit `85d3a0bd7e5dfcf1351ddd48e0930b30e925482a`.
+
+## Qwen Issues Found
+
+- TASK-010 was committed and pushed directly to `beta` instead of a feature branch PR flow.
+- `litellm_config.yaml` was added to the repository.
+- Import contract code was split into a fragile `contracts_api_imports.py` path and did not return the standard `CommandResponse` shape expected by the CLI.
+- The CLI integration was inconsistent.
+- The import adapter was not cleanly integrated into the adapter registry.
+- Tests were too shallow for redaction, no-network, adapter, and CLI behavior.
+- Gemini output for that run did not provide a reliable `Verdict: PASS`.
+
+## Repair Strategy
+
+The untrusted TASK-010 commit was reverted in the recovery branch and the feature was rebuilt in a scoped, deterministic implementation.
+
+## Implemented
+
+- Safe OpenAPI JSON import.
+- Safe Postman collection JSON import.
+- Safe HAR JSON import.
+- Endpoint inventory and import result models.
+- Deterministic endpoint and import IDs.
+- Secret-safe evidence creation for import results.
+- Planning-only `api_import` adapter.
+- CLI/API commands:
+  - `import-openapi`
+  - `import-postman`
+  - `import-har`
+- `.gitignore` protection for repository-local LiteLLM config files.
 
 ## Security Posture
 
-- No offensive, evasion, or session-scraping behavior was added
-- No live network scanning, remote fetching, HAR replay, or external tool execution was added
-- No API keys are required for local development/testing
-- No auth files, cookies, tokens, keyrings, or credential stores were inspected
+- No live network requests.
+- No remote OpenAPI `$ref` fetching.
+- No HAR replay.
+- No Postman script execution.
+- No external scanner execution.
+- No API keys required for local testing.
+- No confirmed findings are created from imports.
+- Risk hints are treated only as inventory triage signals.
+- Imported cookies, auth headers, bearer tokens, API keys, passwords, sessions, token-like values, and sensitive query values are redacted or not stored.
 
-## Risk
+## Tests
 
-- The current implementation depends entirely on supplied metadata
-- No live network requests are performed
-- All sensitive data is properly redacted
+Targeted tests passed during implementation:
 
-## QA Focus
+```text
+cd engine && PYTHONPATH=src python3 -m unittest tests.test_api_import tests.test_adapter_framework tests.test_cli_contracts
+```
 
-- Verify no live network path remains in the TASK-010 flow
-- Verify secrets in Authorization, cookies, and Set-Cookie values stay redacted
-- Verify the new adapter remains green-impact, safe-mode, and no-network
-- Verify evidence generation remains deterministic and secret-safe
-
-## Gemini QA
-
-- Pending.
+Full validation results are recorded in the final task response and relay output.

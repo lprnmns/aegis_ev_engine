@@ -1,14 +1,21 @@
-"""API import foundation for Aegis EV."""
-
+"""Safe API description import helpers."""
 
 from .api_import import (
+    ApiImportSourceType,
     EndpointInventory,
     ImportResult,
-    ApiImport,
+    evidence_from_import_result,
+    import_har,
+    import_openapi,
+    import_postman,
 )
 
 __all__ = [
+    "ApiImportSourceType",
     "EndpointInventory",
     "ImportResult",
-    "ApiImport",
+    "evidence_from_import_result",
+    "import_har",
+    "import_openapi",
+    "import_postman",
 ]

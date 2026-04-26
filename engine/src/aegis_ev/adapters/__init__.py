@@ -4,6 +4,7 @@ from .framework import (
     AdapterMetadata,
     AdapterPlanner,
     AdapterRegistry,
+    ApiImportAdapter,
     DuplicateAdapterError,
     EchoPlanAdapter,
     SafeToolAdapter,
@@ -18,6 +19,7 @@ __all__ = [
     "AdapterMetadata",
     "AdapterPlanner",
     "AdapterRegistry",
+    "ApiImportAdapter",
     "DuplicateAdapterError",
     "EchoPlanAdapter",
     "SafeToolAdapter",
@@ -27,5 +29,3 @@ __all__ = [
     "WebHeaderConfigCheckAdapter",
     "default_registry",
 ]
-
-from .api_import_adapter import ApiImportAdapter

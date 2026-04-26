@@ -1,204 +1,93 @@
-# API Import Foundation
+# TASK-010 API Import Foundation
 
-## Purpose
+TASK-010 adds a safe, JSON-first import foundation for user-provided API and application interface descriptions. It normalizes OpenAPI JSON, Postman collection JSON, and HAR JSON into endpoint inventory records that later validation workflows can use as authorized targets.
 
-TASK-010 adds the foundation for importing OpenAPI, Postman, and HAR files into Aegis EV. This enables users to safely ingest API/application interface descriptions and normalize them into endpoint inventory, evidence, and future validation targets without performing live network requests.
+## What It Does
 
-## What API Import Does
+- Parses supplied OpenAPI 3.x JSON, with basic Swagger 2.0 path/method tolerance.
+- Parses supplied Postman v2.1-style collection JSON, including nested item groups.
+- Parses supplied HAR JSON request metadata.
+- Produces deterministic endpoint inventory models with method, path, URL metadata, operation summaries, parameter summaries, auth indicators, sensitive indicators, and risk hints.
+- Produces import result models with endpoint counts, warnings, errors, evidence IDs, and redaction status.
+- Converts import results into secret-safe evidence records.
+- Adds a planning-only `api_import` adapter for supplied JSON import actions.
+- Adds CLI/API commands:
+  - `import-openapi`
+  - `import-postman`
+  - `import-har`
 
-The API import foundation provides safe parsing and normalization of user-provided API interface descriptions from three sources:
+## What It Does Not Do
 
-1. **OpenAPI JSON** - Parses OpenAPI 3.x specifications
-2. **Postman Collection JSON** - Imports Postman collections 
-3. **HAR JSON** - Imports HTTP Archive files
+- It does not fetch OpenAPI URLs or remote `$ref` values.
+- It does not replay HAR requests.
+- It does not run Postman collections, scripts, tests, or pre-request hooks.
+- It does not crawl, fuzz, scan, brute force, or execute external tools.
+- It does not create confirmed findings.
+- It does not use AI verification or AI-generated conclusions.
+- It does not require API keys or provider secrets for local development.
 
-### Key Features
+## JSON-First Support
 
-- **No Live Network Requests** - All imports work with user-provided data only
-- **No Remote Fetching** - Does not fetch OpenAPI URLs remotely
-- **No HAR Replay** - Does not replay requests from HAR files
-- **No Postman Script Execution** - Does not execute Postman collection scripts
-- **Safe Redaction** - Protects tokens, cookies, and auth headers
-- **Evidence Generation** - Creates structured evidence from imported data
-- **Endpoint Inventory** - Normalizes endpoints into structured inventory
+TASK-010 intentionally supports JSON inputs only. YAML OpenAPI support can be added later if the project accepts a parser dependency or implements a constrained conversion path. Unsupported or malformed inputs return structured errors rather than stack traces.
 
-## What API Import Does Not Do
+## Endpoint Inventory
 
-- Does not prove vulnerabilities
-- Does not perform live network requests
-- Does not fetch remote OpenAPI specifications
-- Does not replay HAR requests
-- Does not execute Postman scripts
-- Does not run Postman collections
-- Does not create confirmed findings from imports
-- Does not store raw secrets from imported files
+Each endpoint inventory record includes deterministic identifiers where practical:
 
-## Supported Formats
+- `endpoint_id`
+- `source_type`
+- `source_id`
+- `method`
+- `path`
+- `url` and `normalized_url` when available
+- `host` and `scheme` when available
+- `operation_id`, `summary`, `description`, and `tags`
+- `parameters_summary`, `request_body_summary`, and `response_summary`
+- `auth_indicators`
+- `sensitive_indicators`
+- `risk_hints`
+- `metadata`
 
-### OpenAPI Import
+Endpoint records are inventory, not vulnerability proof.
 
-- Supports OpenAPI 3.x JSON format
-- Optionally tolerates Swagger/OpenAPI 2.0 if simple
-- No remote $ref fetching
-- No network access
-- No YAML dependency required (JSON-only support)
-- Extracts paths/methods
-- Extracts operationId, tags, summary, description
-- Summarizes parameters/requestBody/responses without dumping raw sensitive data
-- Detects auth indicators from security/securitySchemes
-- Generates endpoint inventory
-- Produces warnings for unsupported features
+## Risk Hints
 
-### Postman Import
+Imports may produce hints such as sensitive path indicators, missing auth indicators for sensitive-looking OpenAPI operations, or legacy-looking endpoint names. These hints are triage signals only. They are not confirmed findings and do not prove exploitability.
 
-- Supports common v2.1 collection structure
-- Walks nested item groups
-- Extracts method, URL/path, headers summary, auth indicators, body mode summary
-- Does not store raw auth headers/tokens/cookies
-- Redacts sensitive header/body samples
-- Does not execute pre-request scripts or tests
-- Does not evaluate scripts
-- Generates endpoint inventory
+## Evidence
 
-### HAR Import
+Import results can be converted into `adapter_output` evidence with `api_import` source type. Evidence stores only redacted structured summaries and endpoint metadata. Raw request bodies, cookies, authorization values, token values, and password-like values are not stored.
 
-- Supports log.entries request objects
-- Extracts method, URL/path, host, query parameter names, header names
-- Redacts all cookie/authorization/token values
-- Does not replay requests
-- Does not store raw bodies by default
-- Deduplicates repeated endpoints where practical
-- Generates endpoint inventory
+## Redaction
 
-## Security Posture
+The import layer aligns with existing audit/evidence/report redaction. It redacts or avoids storing:
 
-The API import foundation maintains the defensive-only posture of Aegis EV:
+- Authorization headers and bearer tokens.
+- API keys.
+- Cookies and `Set-Cookie` values.
+- Session identifiers.
+- Passwords and secret-like values.
+- Sensitive query string values.
 
-- No offensive scanning
-- No stealth or evasion behavior
-- No unauthorized target testing
-- No raw LLM shell execution
-- No exploit payloads
-- No credential attacks
-- No browser session scraping
-- No automatic IP rotation
-- No unauthorized scanning behavior
+Parameter names may remain when useful for inventory, but sensitive values are removed.
 
-## Risk Mitigations
+## Adapter and CLI Contract
 
-### Redaction
+The `api_import` adapter is green-impact, safe-mode compatible, and planning-only. It accepts supplied JSON data and rejects unsupported actions or invalid argument shapes. It does not perform network access.
 
-The import foundation uses the same redaction mechanisms as the existing audit/evidence/report redaction:
+The CLI/API contract commands return machine-readable JSON with the standard response shape:
 
-- Authorization headers
-- Bearer tokens
-- API keys
-- Cookies
-- Set-cookie values
-- Session identifiers
-- Passwords
-- Token-like values
-- Secrets in query strings
+- `ok`
+- `command`
+- `result`
+- `error`
+- `warnings`
+- `metadata`
 
-Imported endpoint summaries may retain parameter names but not sensitive values.
+## Recovery Note
 
-### Evidence Integration
+The first TASK-010 attempt was produced by a non-OpenAI provider and committed directly to `beta`. This GPT recovery branch reverts the untrusted implementation in branch history and replaces it with a reviewed implementation that preserves Aegis EV safety constraints.
 
-Import results and endpoint inventory are converted into safe evidence records:
+## Future Path
 
-- Evidence type may be adapter_output/manual_note/unknown depending on existing enum options
-- Source type indicates openapi/postman/har import
-- Evidence summary mentions endpoint count
-- Structured data is redacted
-- No raw secrets are stored
-- Redaction_applied is true if sensitive fields were seen/redacted
-
-### Finding/Risk Hint Behavior
-
-The import foundation does not create confirmed findings from imports:
-
-- Imports may produce risk_hints only, such as:
-  - Unauthenticated-looking sensitive path
-  - Admin/auth/account/payment path indicators
-  - Deprecated-looking endpoint names
-  - Missing auth indicators in OpenAPI operation if detectable
-- Risk hints are not vulnerabilities
-- If converted to findings at all, they must be draft/candidate and clearly not confirmed
-- Endpoint risk_hints are preferred over real findings in TASK-010
-
-## Future Integration
-
-The endpoint inventory generated by API imports will be used by future Web/API validation features to:
-
-- Validate API endpoints against security policies
-- Generate evidence-backed findings
-- Create validation targets for authorized testing
-- Support retest workflows
-
-## Adapter Integration
-
-The API import foundation includes a safe import adapter:
-
-- ApiImportAdapter
-- Supported actions:
-  - import_openapi
-  - import_postman
-  - import_har
-
-The adapter:
-- Accepts supplied JSON data or safe input path references
-- Does not fetch URLs
-- Does not execute scripts
-- Does not replay requests
-- Is green impact by default
-- Is safe_mode_supported
-- Uses policy validation if target/base URL is supplied
-- Produces audit-safe plan/output
-- Rejects unsupported actions
-- Rejects invalid input shape
-- Redacts sensitive content
-
-## CLI/API Contract Integration
-
-The engine CLI/API contract includes commands for API imports:
-
-- import-openapi
-- import-postman
-- import-har
-
-CLI commands:
-- Accept JSON via stdin or --input-file
-- Output JSON
-- Never call network
-- Never require API keys
-- Never print raw secrets
-- Return non-zero on invalid input
-- Return structured errors
-- Include endpoint_count and warnings
-
-## Test Coverage
-
-The implementation includes thorough unit tests for:
-
-- OpenAPI JSON import extracts endpoints
-- OpenAPI unsupported YAML or invalid JSON fails safely
-- OpenAPI security schemes summarized without secrets
-- Postman collection import extracts nested endpoints
-- Postman auth/header secrets redacted
-- Postman scripts are not executed/evaluated
-- HAR import extracts endpoints
-- HAR cookies/auth headers redacted
-- HAR request bodies not dumped
-- Duplicate HAR endpoints deduplicated where practical
-- Query secret values redacted
-- Endpoint IDs deterministic
-- Evidence generated safely from import result
-- Import adapter rejects unsupported action
-- Import adapter rejects invalid input
-- CLI import-openapi returns parseable JSON
-- CLI import-postman returns parseable JSON
-- CLI import-har returns parseable JSON
-- Invalid CLI input returns structured error
-- No network side effects
-- No raw secrets in serialized import results
-- Imports do not create confirmed findings
+Future tasks may use endpoint inventory for authorized Web/API validation, UI import flows, PDF/report builder output, or approved safe adapters. Those future layers must continue to avoid remote fetching, replay, or scanning unless a later task explicitly adds policy-gated authorized execution.
