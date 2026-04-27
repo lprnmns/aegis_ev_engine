@@ -37,6 +37,7 @@ MACHINE_COMMANDS = (
     "fetch-http-metadata",
     "fetch-and-analyze-headers",
     "fingerprint-technology",
+    "build-attack-surface-graph",
     "run-portfolio-demo",
 )
 

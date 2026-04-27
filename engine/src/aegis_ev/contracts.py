@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from .adapters import AdapterPlanner, ToolActionRequest, UnknownAdapterError, default_registry
+from .attack_surface import build_attack_surface_graph, evidence_from_attack_surface_graph, attack_surface_report_section
 from .approvals import (
     ApprovalActorType,
     ApprovalRequest,
@@ -203,6 +204,8 @@ def run_contract_command(command: str, payload: dict[str, Any]) -> CommandRespon
             return fetch_and_analyze_headers_command(payload)
         if command == "fingerprint-technology":
             return fingerprint_technology_command(payload)
+        if command == "build-attack-surface-graph":
+            return build_attack_surface_graph_command(payload)
         if command == "run-portfolio-demo":
             return run_portfolio_demo_command(payload)
         return failure(command, "unsupported_command", f"Unsupported command: {command}")
@@ -494,6 +497,38 @@ def fingerprint_technology_command(payload: dict[str, Any]) -> CommandResponse:
     response["evidence"] = evidence.to_dict()
     response["findings"] = [item.to_dict() for item in findings_from_fingerprint(fingerprint, evidence)]
     return success(command, response, warnings=list(fingerprint.warnings))
+
+
+def build_attack_surface_graph_command(payload: dict[str, Any]) -> CommandResponse:
+    command = "build-attack-surface-graph"
+    authorization = _authorization_profile(_required_dict(payload, "authorization_profile"))
+    target = str(_required(payload, "target"))
+    graph_input = _required_dict(payload, "graph_input")
+    request = ToolActionRequest(
+        action_id=str(payload.get("action_id", "build_attack_surface_graph")),
+        adapter_id="attack_surface_graph",
+        target=target,
+        action="build_attack_surface_graph",
+        arguments={"graph_input": graph_input},
+        requested_impact_level=payload.get("requested_impact_level", ImpactLevel.GREEN.value),
+        actor=str(payload.get("actor", "contract")),
+        authorization_profile=authorization,
+        dry_run=bool(payload.get("dry_run", True)),
+        requests_used=int(payload.get("requests_used", 0)),
+    )
+    try:
+        plan = AdapterPlanner(default_registry()).plan(request, audit_log=_optional_audit_log(payload))
+    except UnknownAdapterError as exc:
+        return failure(command, "unknown_adapter", str(exc))
+    response: dict[str, Any] = {"plan": _plan_dict(plan), "graph": None, "evidence": None, "report_section": None}
+    if not plan.allowed:
+        return success(command, response)
+    graph = build_attack_surface_graph(graph_input)
+    evidence = evidence_from_attack_surface_graph(graph)
+    response["graph"] = graph.to_dict()
+    response["evidence"] = evidence.to_dict()
+    response["report_section"] = attack_surface_report_section(graph)
+    return success(command, response, warnings=list(graph.warnings))
 
 
 def _fetch_http(payload: dict[str, Any], *, analyze: bool) -> CommandResponse:

@@ -8,6 +8,7 @@ from pathlib import Path
 from aegis_ev.adapters import (
     AdapterPlanner,
     AdapterRegistry,
+    AttackSurfaceGraphAdapter,
     ApiImportAdapter,
     DuplicateAdapterError,
     EchoPlanAdapter,
@@ -194,7 +195,7 @@ class AdapterFrameworkTests(unittest.TestCase):
         adapters = default_registry().list_adapters()
         self.assertEqual(
             [adapter.adapter_id for adapter in adapters],
-            ["api_import", "echo_plan", "safe_http_fetch", "technology_fingerprint", "web_header_config_check"],
+            ["api_import", "attack_surface_graph", "echo_plan", "safe_http_fetch", "technology_fingerprint", "web_header_config_check"],
         )
 
     def test_no_network_side_effects(self):
@@ -299,6 +300,27 @@ class AdapterFrameworkTests(unittest.TestCase):
     def test_technology_fingerprint_adapter_rejects_invalid_arguments(self):
         plan = AdapterPlanner(default_registry()).plan(
             request(adapter_id="technology_fingerprint", action="fingerprint_from_metadata", arguments={"metadata": "not-object"})
+        )
+        self.assertFalse(plan.allowed)
+        self.assertEqual(plan.decision_code, "invalid_arguments")
+
+    def test_attack_surface_graph_adapter_registered_and_safe(self):
+        adapter = default_registry().get("attack_surface_graph")
+        self.assertIsInstance(adapter, AttackSurfaceGraphAdapter)
+        self.assertFalse(adapter.metadata.requires_network)
+        self.assertTrue(adapter.metadata.safe_mode_supported)
+        self.assertEqual(adapter.metadata.default_impact_level, ImpactLevel.GREEN)
+
+    def test_attack_surface_graph_adapter_rejects_unsupported_action(self):
+        plan = AdapterPlanner(default_registry()).plan(
+            request(adapter_id="attack_surface_graph", action="crawl_graph", arguments={"graph_input": {}})
+        )
+        self.assertFalse(plan.allowed)
+        self.assertEqual(plan.decision_code, "unsupported_action")
+
+    def test_attack_surface_graph_adapter_rejects_invalid_arguments(self):
+        plan = AdapterPlanner(default_registry()).plan(
+            request(adapter_id="attack_surface_graph", action="build_attack_surface_graph", arguments={"graph_input": "not-object"})
         )
         self.assertFalse(plan.allowed)
         self.assertEqual(plan.decision_code, "invalid_arguments")
