@@ -219,6 +219,30 @@ class SafeHttpFetchAdapter(SafeToolAdapter):
         return "Collect passive HTTP metadata with strict policy, redirect, timeout, and no-body controls."
 
 
+class TechnologyFingerprintAdapter(SafeToolAdapter):
+    """Planning-only adapter for passive supplied-metadata fingerprinting."""
+
+    metadata = AdapterMetadata(
+        adapter_id="technology_fingerprint",
+        display_name="Passive Technology Fingerprint Adapter",
+        description="Fingerprints supplied HTTP metadata and capped HTML hints without network, asset fetch, or script execution.",
+        supported_actions=("fingerprint_from_metadata",),
+        default_impact_level=ImpactLevel.GREEN,
+        requires_network=False,
+        requires_authentication=False,
+        allowed_target_types=("url", "domain"),
+        allowed_argument_schema={"metadata": "object"},
+        timeout_seconds=5,
+        max_requests=1,
+        max_concurrency=1,
+        produces_evidence=True,
+        safe_mode_supported=True,
+    )
+
+    def execution_preview(self, request: ToolActionRequest, sanitized_arguments: dict[str, Any]) -> str:
+        return "Analyze supplied metadata locally for conservative technology hints; no network or asset fetching."
+
+
 @dataclass
 class AdapterRegistry:
     _adapters: dict[str, SafeToolAdapter] = field(default_factory=dict)
@@ -401,6 +425,7 @@ def default_registry() -> AdapterRegistry:
     registry.register(ApiImportAdapter())
     registry.register(EchoPlanAdapter())
     registry.register(SafeHttpFetchAdapter())
+    registry.register(TechnologyFingerprintAdapter())
     registry.register(WebHeaderConfigCheckAdapter())
     return registry
 

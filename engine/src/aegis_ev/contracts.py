@@ -32,6 +32,12 @@ from .http_fetch import (
     fixture_transport,
     safe_http_fetch,
 )
+from .fingerprinting import (
+    TechnologyFingerprintInput,
+    evidence_from_fingerprint,
+    fingerprint_technology,
+    findings_from_fingerprint,
+)
 from .imports import evidence_from_import_result, import_har, import_openapi, import_postman
 from .models import AuthorizationProfile, ImpactLevel, PolicyBudget, RequestBudget, ToolIntent
 from .policy import PolicyEngine
@@ -195,6 +201,8 @@ def run_contract_command(command: str, payload: dict[str, Any]) -> CommandRespon
             return fetch_http_metadata_command(payload)
         if command == "fetch-and-analyze-headers":
             return fetch_and_analyze_headers_command(payload)
+        if command == "fingerprint-technology":
+            return fingerprint_technology_command(payload)
         if command == "run-portfolio-demo":
             return run_portfolio_demo_command(payload)
         return failure(command, "unsupported_command", f"Unsupported command: {command}")
@@ -433,6 +441,59 @@ def fetch_http_metadata_command(payload: dict[str, Any]) -> CommandResponse:
 
 def fetch_and_analyze_headers_command(payload: dict[str, Any]) -> CommandResponse:
     return _fetch_http(payload, analyze=True)
+
+
+def fingerprint_technology_command(payload: dict[str, Any]) -> CommandResponse:
+    command = "fingerprint-technology"
+    authorization = _authorization_profile(_required_dict(payload, "authorization_profile"))
+    target = str(_required(payload, "target"))
+    metadata = _required_dict(payload, "metadata")
+    request = ToolActionRequest(
+        action_id=str(payload.get("action_id", "fingerprint_technology")),
+        adapter_id="technology_fingerprint",
+        target=target,
+        action="fingerprint_from_metadata",
+        arguments={"metadata": metadata},
+        requested_impact_level=payload.get("requested_impact_level", ImpactLevel.GREEN.value),
+        actor=str(payload.get("actor", "contract")),
+        authorization_profile=authorization,
+        dry_run=bool(payload.get("dry_run", True)),
+        requests_used=int(payload.get("requests_used", 0)),
+    )
+    try:
+        plan = AdapterPlanner(default_registry()).plan(request, audit_log=_optional_audit_log(payload))
+    except UnknownAdapterError as exc:
+        return failure(command, "unknown_adapter", str(exc))
+    response: dict[str, Any] = {"plan": _plan_dict(plan), "fingerprint": None, "evidence": None, "findings": []}
+    if not plan.allowed:
+        return success(command, response)
+    fetch_payload = metadata.get("fetch_result") if isinstance(metadata.get("fetch_result"), dict) else {}
+    merged_headers = _dict_or_empty(metadata.get("headers") or fetch_payload.get("headers") or {})
+    fingerprint = fingerprint_technology(
+        TechnologyFingerprintInput(
+            target=target,
+            normalized_target=metadata.get("normalized_target") or fetch_payload.get("normalized_target") or plan.normalized_target,
+            source_type=str(metadata.get("source_type", "cli_supplied_metadata")),
+            headers=merged_headers,
+            final_url=metadata.get("final_url") or fetch_payload.get("final_url"),
+            redirect_chain=tuple(metadata.get("redirect_chain") or fetch_payload.get("redirect_chain") or []),
+            content_type=metadata.get("content_type") or fetch_payload.get("content_type"),
+            content_length=metadata.get("content_length") or fetch_payload.get("content_length"),
+            capped_html_snippet=metadata.get("capped_html_snippet"),
+            script_src=tuple(metadata.get("script_src", [])),
+            link_href=tuple(metadata.get("link_href", [])),
+            meta_tags=tuple(metadata.get("meta_tags", [])),
+            endpoint_inventory=tuple(metadata.get("endpoint_inventory", [])),
+            evidence_ids=tuple(metadata.get("evidence_ids", [])),
+            created_at_utc=metadata.get("created_at_utc"),
+            metadata={"command": command},
+        )
+    )
+    evidence = evidence_from_fingerprint(fingerprint, related_adapter_id="technology_fingerprint")
+    response["fingerprint"] = fingerprint.to_dict()
+    response["evidence"] = evidence.to_dict()
+    response["findings"] = [item.to_dict() for item in findings_from_fingerprint(fingerprint, evidence)]
+    return success(command, response, warnings=list(fingerprint.warnings))
 
 
 def _fetch_http(payload: dict[str, Any], *, analyze: bool) -> CommandResponse:

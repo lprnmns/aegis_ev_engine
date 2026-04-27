@@ -36,6 +36,7 @@ MACHINE_COMMANDS = (
     "demo-flow",
     "fetch-http-metadata",
     "fetch-and-analyze-headers",
+    "fingerprint-technology",
     "run-portfolio-demo",
 )
 
