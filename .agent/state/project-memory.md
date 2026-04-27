@@ -43,7 +43,7 @@ Aegis EV uses a local-first architecture:
 
 ## Current Task
 
-TASK-013 safe HTTP metadata fetch.
+TASK-014 authorized portfolio demo harness.
 
 ## Open Decisions
 
@@ -69,3 +69,4 @@ TASK-013 safe HTTP metadata fetch.
 - TASK-011 adds durable project, target, scope, session, and workspace store models with CLI/API contract commands, policy-backed scope validation, reference linking, portfolio-demo placeholder readiness, and no live network or secret/session material storage.
 - TASK-012 adds a deterministic fixture-only local demo flow that creates project/scope/targets/session state, imports safe fixtures, analyzes supplied headers, creates evidence and candidate findings, verifies audit, and renders Markdown/JSON reports without contacting any live site.
 - TASK-013 adds the first live-capable but conservative safe HTTP metadata fetch layer with policy-before-transport enforcement, HEAD/passive GET only, strict redirect/timeout controls, no body storage, audit/evidence/header-check integration, fake transport tests, and no crawler/fuzzer/scanner behavior.
+- TASK-014 adds an authorized portfolio demo harness with ignored local input, required owner attestation, safe-mode gating, policy-scoped single-target metadata/header analysis, audit/evidence/candidate finding/report integration, and no real portfolio URL committed.

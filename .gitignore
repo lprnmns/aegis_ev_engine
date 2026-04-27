@@ -8,7 +8,9 @@ __pycache__/
 
 # Local app data
 .aegis/
+local/
 output/demo/
+output/portfolio-demo/
 .env
 .env.*
 !.env.example

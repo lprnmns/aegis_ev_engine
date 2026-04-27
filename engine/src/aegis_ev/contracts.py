@@ -35,6 +35,7 @@ from .http_fetch import (
 from .imports import evidence_from_import_result, import_har, import_openapi, import_postman
 from .models import AuthorizationProfile, ImpactLevel, PolicyBudget, RequestBudget, ToolIntent
 from .policy import PolicyEngine
+from .portfolio_demo import run_portfolio_demo_from_payload
 from .projects import (
     ProjectWorkspaceStore,
     create_project_record,
@@ -194,6 +195,8 @@ def run_contract_command(command: str, payload: dict[str, Any]) -> CommandRespon
             return fetch_http_metadata_command(payload)
         if command == "fetch-and-analyze-headers":
             return fetch_and_analyze_headers_command(payload)
+        if command == "run-portfolio-demo":
+            return run_portfolio_demo_command(payload)
         return failure(command, "unsupported_command", f"Unsupported command: {command}")
     except (KeyError, TypeError, ValueError) as exc:
         return failure(command, "invalid_request", str(exc))
@@ -661,6 +664,11 @@ def link_project_reference(payload: dict[str, Any]) -> CommandResponse:
 def run_demo_flow_command(payload: dict[str, Any], *, command: str = "run-demo-flow") -> CommandResponse:
     result = run_demo_flow_from_payload(payload)
     return success(command, {"demo": result.to_dict()}, warnings=list(result.warnings))
+
+
+def run_portfolio_demo_command(payload: dict[str, Any]) -> CommandResponse:
+    result = run_portfolio_demo_from_payload(payload)
+    return success("run-portfolio-demo", {"demo": result.to_dict()}, warnings=list(result.warnings))
 
 
 def verify_audit(payload: dict[str, Any]) -> CommandResponse:
