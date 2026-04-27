@@ -1,3 +1,10 @@
+# Local Relay Report: TASK-014-portfolio-demo-harness
+
+Updated: 2026-04-27T09:21:28.824111+00:00
+
+## State
+
+```json
 {
   "task_id": "TASK-014-portfolio-demo-harness",
   "branch": "feat/TASK-014-portfolio-demo-harness",
@@ -10,3 +17,8 @@
   "next_actor": "done",
   "blocked": false
 }
+```
+
+## Events
+
+- Gemini verdict: `PASS`.
