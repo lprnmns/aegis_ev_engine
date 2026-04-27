@@ -43,7 +43,7 @@ Aegis EV uses a local-first architecture:
 
 ## Current Task
 
-TASK-014 authorized portfolio demo harness.
+TASK-015 passive technology fingerprinting.
 
 ## Open Decisions
 
@@ -70,3 +70,4 @@ TASK-014 authorized portfolio demo harness.
 - TASK-012 adds a deterministic fixture-only local demo flow that creates project/scope/targets/session state, imports safe fixtures, analyzes supplied headers, creates evidence and candidate findings, verifies audit, and renders Markdown/JSON reports without contacting any live site.
 - TASK-013 adds the first live-capable but conservative safe HTTP metadata fetch layer with policy-before-transport enforcement, HEAD/passive GET only, strict redirect/timeout controls, no body storage, audit/evidence/header-check integration, fake transport tests, and no crawler/fuzzer/scanner behavior.
 - TASK-014 adds an authorized portfolio demo harness with ignored local input, required owner attestation, safe-mode gating, policy-scoped single-target metadata/header analysis, audit/evidence/candidate finding/report integration, and no real portfolio URL committed.
+- TASK-015 adds passive technology fingerprinting from supplied HTTP metadata, capped HTML snippets, asset path hints, and imported endpoint inventory, producing evidence and risk hypotheses without crawling, asset fetching, scanners, AI verification, or confirmed vulnerability claims.
