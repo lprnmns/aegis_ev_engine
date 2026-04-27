@@ -267,6 +267,30 @@ class AttackSurfaceGraphAdapter(SafeToolAdapter):
         return "Build supplied-data attack surface graph locally without network, asset fetching, or scanners."
 
 
+class VulnerabilityIntelAdapter(SafeToolAdapter):
+    """Planning-only adapter for offline supplied-data knowledge mapping."""
+
+    metadata = AdapterMetadata(
+        adapter_id="vulnerability_intelligence",
+        display_name="Vulnerability Intelligence Mapping Adapter",
+        description="Maps supplied attack surface signals to offline security knowledge records without live feeds or tool execution.",
+        supported_actions=("map_vulnerability_intelligence",),
+        default_impact_level=ImpactLevel.GREEN,
+        requires_network=False,
+        requires_authentication=False,
+        allowed_target_types=("url", "domain"),
+        allowed_argument_schema={"mapping_input": "object"},
+        timeout_seconds=5,
+        max_requests=1,
+        max_concurrency=1,
+        produces_evidence=True,
+        safe_mode_supported=True,
+    )
+
+    def execution_preview(self, request: ToolActionRequest, sanitized_arguments: dict[str, Any]) -> str:
+        return "Map supplied attack surface data to offline knowledge records; no live feed, network, or tool execution."
+
+
 @dataclass
 class AdapterRegistry:
     _adapters: dict[str, SafeToolAdapter] = field(default_factory=dict)
@@ -451,6 +475,7 @@ def default_registry() -> AdapterRegistry:
     registry.register(EchoPlanAdapter())
     registry.register(SafeHttpFetchAdapter())
     registry.register(TechnologyFingerprintAdapter())
+    registry.register(VulnerabilityIntelAdapter())
     registry.register(WebHeaderConfigCheckAdapter())
     return registry
 

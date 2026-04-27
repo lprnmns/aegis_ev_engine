@@ -52,6 +52,12 @@ from .projects import (
     validate_target_against_scope,
 )
 from .reporting import create_report, render_report_json, render_report_markdown
+from .vuln_intel import (
+    evidence_from_vulnerability_mapping,
+    findings_from_vulnerability_mapping,
+    map_vulnerability_intelligence,
+    vulnerability_intelligence_report_section,
+)
 
 
 @dataclass(frozen=True)
@@ -206,6 +212,8 @@ def run_contract_command(command: str, payload: dict[str, Any]) -> CommandRespon
             return fingerprint_technology_command(payload)
         if command == "build-attack-surface-graph":
             return build_attack_surface_graph_command(payload)
+        if command == "map-vulnerability-intelligence":
+            return map_vulnerability_intelligence_command(payload)
         if command == "run-portfolio-demo":
             return run_portfolio_demo_command(payload)
         return failure(command, "unsupported_command", f"Unsupported command: {command}")
@@ -529,6 +537,39 @@ def build_attack_surface_graph_command(payload: dict[str, Any]) -> CommandRespon
     response["evidence"] = evidence.to_dict()
     response["report_section"] = attack_surface_report_section(graph)
     return success(command, response, warnings=list(graph.warnings))
+
+
+def map_vulnerability_intelligence_command(payload: dict[str, Any]) -> CommandResponse:
+    command = "map-vulnerability-intelligence"
+    authorization = _authorization_profile(_required_dict(payload, "authorization_profile"))
+    target = str(_required(payload, "target"))
+    mapping_input = _required_dict(payload, "mapping_input")
+    request = ToolActionRequest(
+        action_id=str(payload.get("action_id", "map_vulnerability_intelligence")),
+        adapter_id="vulnerability_intelligence",
+        target=target,
+        action="map_vulnerability_intelligence",
+        arguments={"mapping_input": mapping_input},
+        requested_impact_level=payload.get("requested_impact_level", ImpactLevel.GREEN.value),
+        actor=str(payload.get("actor", "contract")),
+        authorization_profile=authorization,
+        dry_run=bool(payload.get("dry_run", True)),
+        requests_used=int(payload.get("requests_used", 0)),
+    )
+    try:
+        plan = AdapterPlanner(default_registry()).plan(request, audit_log=_optional_audit_log(payload))
+    except UnknownAdapterError as exc:
+        return failure(command, "unknown_adapter", str(exc))
+    response: dict[str, Any] = {"plan": _plan_dict(plan), "mapping": None, "evidence": None, "findings": [], "report_section": None}
+    if not plan.allowed:
+        return success(command, response)
+    mapping = map_vulnerability_intelligence(mapping_input)
+    evidence = evidence_from_vulnerability_mapping(mapping)
+    response["mapping"] = mapping.to_dict()
+    response["evidence"] = evidence.to_dict()
+    response["findings"] = [item.to_dict() for item in findings_from_vulnerability_mapping(mapping)]
+    response["report_section"] = vulnerability_intelligence_report_section(mapping)
+    return success(command, response, warnings=list(mapping.warnings))
 
 
 def _fetch_http(payload: dict[str, Any], *, analyze: bool) -> CommandResponse:

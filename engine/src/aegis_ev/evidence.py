@@ -33,6 +33,7 @@ class EvidenceSourceType(str, Enum):
     SAFE_HTTP_FETCH = "safe_http_fetch"
     TECHNOLOGY_FINGERPRINT = "technology_fingerprint"
     ATTACK_SURFACE_GRAPH = "attack_surface_graph"
+    VULNERABILITY_INTELLIGENCE = "vulnerability_intelligence"
     AUDIT = "audit"
     HUMAN = "human"
     AI_VERIFIER = "ai_verifier"

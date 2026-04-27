@@ -14,6 +14,7 @@ from .framework import (
     ToolActionPlan,
     ToolActionRequest,
     UnknownAdapterError,
+    VulnerabilityIntelAdapter,
     WebHeaderConfigCheckAdapter,
     default_registry,
 )
@@ -32,6 +33,7 @@ __all__ = [
     "ToolActionPlan",
     "ToolActionRequest",
     "UnknownAdapterError",
+    "VulnerabilityIntelAdapter",
     "WebHeaderConfigCheckAdapter",
     "default_registry",
 ]

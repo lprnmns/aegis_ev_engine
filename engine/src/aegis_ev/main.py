@@ -38,6 +38,7 @@ MACHINE_COMMANDS = (
     "fetch-and-analyze-headers",
     "fingerprint-technology",
     "build-attack-surface-graph",
+    "map-vulnerability-intelligence",
     "run-portfolio-demo",
 )
 

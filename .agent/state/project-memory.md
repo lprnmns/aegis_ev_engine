@@ -43,7 +43,7 @@ Aegis EV uses a local-first architecture:
 
 ## Current Task
 
-TASK-016 attack surface graph.
+TASK-017 vulnerability intelligence mapping.
 
 ## Open Decisions
 
@@ -72,3 +72,4 @@ TASK-016 attack surface graph.
 - TASK-014 adds an authorized portfolio demo harness with ignored local input, required owner attestation, safe-mode gating, policy-scoped single-target metadata/header analysis, audit/evidence/candidate finding/report integration, and no real portfolio URL committed.
 - TASK-015 adds passive technology fingerprinting from supplied HTTP metadata, capped HTML snippets, asset path hints, and imported endpoint inventory, producing evidence and risk hypotheses without crawling, asset fetching, scanners, AI verification, or confirmed vulnerability claims.
 - TASK-016 adds a deterministic attack surface graph that connects projects, targets, endpoints, technologies, controls, evidence, candidate findings, and risk hypotheses from supplied safe data without network, crawling, scanners, or confirmed vulnerability claims.
+- TASK-017 adds offline-first vulnerability intelligence mapping from supplied attack surface and fingerprint signals to local OWASP/CWE/CVE-style/KEV-style/EPSS-style knowledge records, producing conservative knowledge matches and evidence without live feed ingestion, network access, intrusive validation, or confirmed vulnerability claims.
