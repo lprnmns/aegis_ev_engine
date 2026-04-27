@@ -314,6 +314,54 @@ class EngineCliContractTests(unittest.TestCase):
         self.assertFalse(response["ok"])
         self.assertEqual(response["error"]["code"], "invalid_request")
 
+    def test_cli_fetch_http_metadata_returns_parseable_json(self):
+        code, response = run_cli(
+            ["fetch-http-metadata"],
+            {
+                "target": "https://example.com",
+                "authorization_profile": auth(),
+                "transport_fixture": {"status_code": 200, "headers": {"Content-Type": "text/html"}},
+            },
+        )
+        self.assertEqual(code, 0)
+        self.assertTrue(response["ok"])
+        self.assertTrue(response["result"]["fetch"]["no_body_stored"])
+        self.assertEqual(response["result"]["fetch"]["status_code"], 200)
+
+    def test_cli_fetch_and_analyze_headers_returns_candidate_findings(self):
+        code, response = run_cli(
+            ["fetch-and-analyze-headers"],
+            {
+                "target": "https://example.com",
+                "authorization_profile": auth(),
+                "transport_fixture": {"status_code": 200, "headers": {"Content-Type": "text/html"}},
+            },
+        )
+        self.assertEqual(code, 0)
+        findings = response["result"]["findings"]
+        self.assertTrue(findings)
+        self.assertNotIn("confirmed", {finding["status"] for finding in findings})
+
+    def test_cli_fetch_http_metadata_invalid_input_returns_structured_error(self):
+        code, response = run_cli(["fetch-http-metadata"], {"target": "https://example.com"})
+        self.assertEqual(code, 1)
+        self.assertFalse(response["ok"])
+        self.assertEqual(response["error"]["code"], "invalid_request")
+
+    def test_cli_fetch_http_metadata_rejects_custom_auth_headers(self):
+        code, response = run_cli(
+            ["fetch-http-metadata"],
+            {
+                "target": "https://example.com",
+                "authorization_profile": auth(),
+                "headers": {"Authorization": "Bearer " + SECRET_VALUE},
+                "transport_fixture": {"status_code": 200, "headers": {}},
+            },
+        )
+        self.assertEqual(code, 1)
+        self.assertFalse(response["ok"])
+        self.assertNotIn(SECRET_VALUE, json.dumps(response, sort_keys=True))
+
     def test_report_render_returns_deterministic_markdown(self):
         payload = report_payload(format="markdown")
         first = run_cli(["render-report"], payload)

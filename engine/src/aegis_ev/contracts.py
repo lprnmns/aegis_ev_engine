@@ -25,6 +25,13 @@ from .checks.web_headers import (
 )
 from .demo_flow import run_demo_flow_from_payload
 from .evidence import EvidenceRecord, EvidenceStore, FindingRecord
+from .http_fetch import (
+    SafeHttpFetchRequest,
+    analyze_headers_from_fetch_result,
+    evidence_from_fetch_result,
+    fixture_transport,
+    safe_http_fetch,
+)
 from .imports import evidence_from_import_result, import_har, import_openapi, import_postman
 from .models import AuthorizationProfile, ImpactLevel, PolicyBudget, RequestBudget, ToolIntent
 from .policy import PolicyEngine
@@ -183,6 +190,10 @@ def run_contract_command(command: str, payload: dict[str, Any]) -> CommandRespon
             return link_project_reference(payload)
         if command in {"run-demo-flow", "demo-flow"}:
             return run_demo_flow_command(payload, command=command)
+        if command == "fetch-http-metadata":
+            return fetch_http_metadata_command(payload)
+        if command == "fetch-and-analyze-headers":
+            return fetch_and_analyze_headers_command(payload)
         return failure(command, "unsupported_command", f"Unsupported command: {command}")
     except (KeyError, TypeError, ValueError) as exc:
         return failure(command, "invalid_request", str(exc))
@@ -411,6 +422,75 @@ def analyze_web_headers_command(payload: dict[str, Any]) -> CommandResponse:
     result["evidence"] = [item.to_dict() for item in evidence_records]
     result["findings"] = [item.to_dict() for item in finding_records]
     return success("analyze-web-headers", result, warnings=warnings)
+
+
+def fetch_http_metadata_command(payload: dict[str, Any]) -> CommandResponse:
+    return _fetch_http(payload, analyze=False)
+
+
+def fetch_and_analyze_headers_command(payload: dict[str, Any]) -> CommandResponse:
+    return _fetch_http(payload, analyze=True)
+
+
+def _fetch_http(payload: dict[str, Any], *, analyze: bool) -> CommandResponse:
+    command = "fetch-and-analyze-headers" if analyze else "fetch-http-metadata"
+    if payload.get("headers"):
+        raise ValueError("custom request headers are not accepted by safe HTTP fetch")
+    authorization = _authorization_profile(_required_dict(payload, "authorization_profile"))
+    method = str(payload.get("method", "HEAD")).upper()
+    target = str(_required(payload, "target"))
+    request_context = {
+        "method": method,
+        "max_redirects": int(payload.get("max_redirects", 3)),
+        "timeout_seconds": int(payload.get("timeout_seconds", 5)),
+        "no_body_stored": True,
+    }
+    plan_request = ToolActionRequest(
+        action_id=str(payload.get("action_id", command.replace("-", "_"))),
+        adapter_id="safe_http_fetch",
+        target=target,
+        action="fetch_and_analyze_headers" if analyze else "fetch_metadata",
+        arguments={"request": request_context},
+        requested_impact_level=payload.get("requested_impact_level", ImpactLevel.GREEN.value),
+        actor=str(payload.get("actor", "contract")),
+        authorization_profile=authorization,
+        dry_run=bool(payload.get("dry_run", True)),
+        requests_used=int(payload.get("requests_used", 0)),
+    )
+    try:
+        plan = AdapterPlanner(default_registry()).plan(plan_request, audit_log=_optional_audit_log(payload))
+    except UnknownAdapterError as exc:
+        return failure(command, "unknown_adapter", str(exc))
+    fetch_request = SafeHttpFetchRequest(
+        fetch_id=str(payload.get("fetch_id", command.replace("-", "_"))),
+        target=target,
+        authorization_profile=authorization,
+        method=method,
+        requested_by=str(payload.get("requested_by", payload.get("actor", "contract"))),
+        actor=str(payload.get("actor", "contract")),
+        max_redirects=int(payload.get("max_redirects", 3)),
+        timeout_seconds=int(payload.get("timeout_seconds", 5)),
+        requested_impact_level=payload.get("requested_impact_level", ImpactLevel.GREEN.value),
+        requests_used=int(payload.get("requests_used", 0)),
+        now=_optional_datetime(payload.get("now")),
+        metadata={"command": command},
+    )
+    transport = fixture_transport(_required_dict(payload, "transport_fixture")) if payload.get("transport_fixture") else None
+    result = safe_http_fetch(fetch_request, transport=transport, audit_log=_optional_audit_log(payload))
+    response: dict[str, Any] = {"plan": _plan_dict(plan), "fetch": result.to_dict()}
+    if result.allowed and not result.error:
+        evidence = evidence_from_fetch_result(result)
+        response["evidence"] = evidence.to_dict()
+    else:
+        response["evidence"] = None
+    if analyze:
+        checks, evidence_records, finding_records = analyze_headers_from_fetch_result(result)
+        response["checks"] = checks
+        response["header_evidence"] = [item.to_dict() for item in evidence_records]
+        response["findings"] = [item.to_dict() for item in finding_records]
+    if not plan.allowed:
+        response["fetch"] = result.to_dict()
+    return success(command, response, warnings=list(result.warnings))
 
 
 def import_openapi_command(payload: dict[str, Any]) -> CommandResponse:
@@ -797,6 +877,12 @@ def _optional_datetime(value: Any) -> datetime | None:
 
 def _approval_store_path(payload: dict[str, Any]) -> Path:
     return Path(str(_required(payload, "approval_store")))
+
+
+def _optional_audit_log(payload: dict[str, Any]) -> AuditLog | None:
+    if not payload.get("audit_log"):
+        return None
+    return AuditLog(str(payload["audit_log"]))
 
 
 def _workspace_store(payload: dict[str, Any]) -> tuple[ProjectWorkspaceStore, Path | None]:

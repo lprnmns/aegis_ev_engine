@@ -1,12 +1,12 @@
 {
-  "task_id": "TASK-012-end-to-end-local-demo-flow",
-  "branch": "feat/TASK-012-end-to-end-local-demo-flow",
+  "task_id": "TASK-013-safe-http-fetch",
+  "branch": "feat/TASK-013-safe-http-fetch",
   "base_branch": "beta",
-  "status": "passed",
+  "status": "local_tests_passed",
   "loop_count": 0,
   "max_loops": 1,
   "last_codex_commit": null,
-  "last_gemini_verdict": "PASS",
-  "next_actor": "done",
+  "last_gemini_verdict": null,
+  "next_actor": "gemini",
   "blocked": false
 }
