@@ -1,12 +1,12 @@
 {
-  "task_id": "TASK-015-passive-tech-fingerprinting",
-  "branch": "feat/TASK-015-passive-tech-fingerprinting",
+  "task_id": "TASK-016-attack-surface-graph",
+  "branch": "feat/TASK-016-attack-surface-graph",
   "base_branch": "beta",
-  "status": "passed",
+  "status": "in_progress",
   "loop_count": 0,
   "max_loops": 1,
   "last_codex_commit": null,
-  "last_gemini_verdict": "PASS",
-  "next_actor": "done",
+  "last_gemini_verdict": null,
+  "next_actor": "codex",
   "blocked": false
 }

@@ -1,0 +1,91 @@
+{
+  "created_at_utc": "2026-01-01T00:00:00+00:00",
+  "project": {
+    "project_id": "project_demo_attack_surface",
+    "name": "Portfolio Placeholder Attack Surface",
+    "environment": "staging",
+    "targets": [
+      {
+        "target_id": "target_placeholder",
+        "target_type": "url",
+        "value": "https://portfolio.example.test",
+        "normalized_value": "https://portfolio.example.test",
+        "display_name": "Portfolio placeholder",
+        "in_scope": true
+      }
+    ]
+  },
+  "endpoints": [
+    {
+      "endpoint_id": "endpoint_login",
+      "source_type": "openapi",
+      "method": "GET",
+      "path": "/admin/login",
+      "auth_indicators": [],
+      "risk_hints": ["sensitive_path_without_auth_indicator"],
+      "evidence_id": "evidence_import_1"
+    },
+    {
+      "endpoint_id": "endpoint_api",
+      "source_type": "openapi",
+      "method": "POST",
+      "path": "/api/profile",
+      "auth_indicators": ["bearer_auth"],
+      "evidence_id": "evidence_import_1"
+    }
+  ],
+  "technology_fingerprint": {
+    "fingerprint_id": "fingerprint_demo",
+    "target": "https://portfolio.example.test",
+    "normalized_target": "https://portfolio.example.test",
+    "detected_technologies": [
+      {
+        "name": "Next.js",
+        "category": "frontend_framework",
+        "confidence": "high",
+        "evidence_source": "html/assets",
+        "evidence_summary": "Next.js marker supplied.",
+        "tags": ["frontend"]
+      },
+      {
+        "name": "Vercel",
+        "category": "hosting",
+        "confidence": "high",
+        "evidence_source": "headers",
+        "evidence_summary": "Vercel header supplied.",
+        "tags": ["hosting"]
+      }
+    ],
+    "detected_security_controls": ["Strict-Transport-Security"],
+    "detected_missing_controls": ["Content-Security-Policy", "X-Frame-Options"],
+    "asset_hints": ["nextjs_asset_path", "source_map_reference_hint"],
+    "admin_surface_hints": ["/admin/login"],
+    "api_surface_hints": ["/api/profile"],
+    "risk_hypotheses": [
+      {
+        "hypothesis_id": "hypothesis_demo",
+        "title": "Missing CSP on frontend application",
+        "rationale": "Frontend framework hint plus missing CSP.",
+        "related_technology": "Next.js",
+        "related_evidence_ids": ["evidence_fingerprint_1"],
+        "suggested_safe_next_step": "Review headers before active validation.",
+        "required_impact_level": "green",
+        "confidence": "medium",
+        "status": "hypothesis"
+      }
+    ],
+    "evidence_ids": ["evidence_fingerprint_1"]
+  },
+  "evidence": [
+    {
+      "evidence_id": "evidence_import_1",
+      "source_type": "api_import",
+      "title": "Imported endpoints"
+    },
+    {
+      "evidence_id": "evidence_fingerprint_1",
+      "source_type": "technology_fingerprint",
+      "title": "Fingerprint"
+    }
+  ]
+}

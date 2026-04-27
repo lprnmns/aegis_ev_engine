@@ -243,6 +243,30 @@ class TechnologyFingerprintAdapter(SafeToolAdapter):
         return "Analyze supplied metadata locally for conservative technology hints; no network or asset fetching."
 
 
+class AttackSurfaceGraphAdapter(SafeToolAdapter):
+    """Planning-only adapter for supplied-data attack surface graph construction."""
+
+    metadata = AdapterMetadata(
+        adapter_id="attack_surface_graph",
+        display_name="Attack Surface Graph Adapter",
+        description="Builds a deterministic attack surface graph from supplied safe data without network or scanner execution.",
+        supported_actions=("build_attack_surface_graph",),
+        default_impact_level=ImpactLevel.GREEN,
+        requires_network=False,
+        requires_authentication=False,
+        allowed_target_types=("url", "domain"),
+        allowed_argument_schema={"graph_input": "object"},
+        timeout_seconds=5,
+        max_requests=1,
+        max_concurrency=1,
+        produces_evidence=True,
+        safe_mode_supported=True,
+    )
+
+    def execution_preview(self, request: ToolActionRequest, sanitized_arguments: dict[str, Any]) -> str:
+        return "Build supplied-data attack surface graph locally without network, asset fetching, or scanners."
+
+
 @dataclass
 class AdapterRegistry:
     _adapters: dict[str, SafeToolAdapter] = field(default_factory=dict)
@@ -422,6 +446,7 @@ class AdapterPlanner:
 
 def default_registry() -> AdapterRegistry:
     registry = AdapterRegistry()
+    registry.register(AttackSurfaceGraphAdapter())
     registry.register(ApiImportAdapter())
     registry.register(EchoPlanAdapter())
     registry.register(SafeHttpFetchAdapter())
