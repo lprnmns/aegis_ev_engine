@@ -2,11 +2,11 @@
   "task_id": "TASK-015-passive-tech-fingerprinting",
   "branch": "feat/TASK-015-passive-tech-fingerprinting",
   "base_branch": "beta",
-  "status": "in_progress",
+  "status": "local_tests_passed",
   "loop_count": 0,
   "max_loops": 1,
   "last_codex_commit": null,
   "last_gemini_verdict": null,
-  "next_actor": "codex",
+  "next_actor": "gemini",
   "blocked": false
 }
