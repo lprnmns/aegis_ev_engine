@@ -1,0 +1,61 @@
+{
+  "records": [
+    {
+      "record_id": "owasp-web-a05-missing-csp",
+      "record_type": "owasp",
+      "title": "Missing Content Security Policy",
+      "summary": "A missing Content Security Policy is a secure configuration concern that can increase browser-side risk when script-capable applications are present.",
+      "category": "secure_configuration",
+      "severity_hint": "medium",
+      "confidence": "medium",
+      "references": ["OWASP Top 10 A05:2021 Security Misconfiguration"],
+      "related_cwe_ids": ["CWE-693"],
+      "related_owasp_refs": ["OWASP-A05"],
+      "affected_technology_patterns": ["frontend-framework", "next.js", "nuxt", "astro", "sveltekit"],
+      "affected_surface_patterns": [],
+      "detection_signals": ["content-security-policy", "missing csp", "missing content security policy"],
+      "remediation_summary": "Define a restrictive Content Security Policy appropriate for the application and test it in report-only mode before enforcement.",
+      "safe_next_steps": ["Review supplied headers and application script requirements before proposing a CSP policy."],
+      "tags": ["secure-configuration", "browser-control"],
+      "metadata": {"fixture_only": true}
+    },
+    {
+      "record_id": "owasp-web-a05-cors-wildcard-credentials",
+      "record_type": "owasp",
+      "title": "Wildcard CORS With Credentials",
+      "summary": "A permissive CORS configuration that allows credentials should be reviewed because it may allow unintended browser access patterns.",
+      "category": "secure_configuration",
+      "severity_hint": "high",
+      "confidence": "medium",
+      "references": ["OWASP Top 10 A05:2021 Security Misconfiguration"],
+      "related_cwe_ids": ["CWE-942"],
+      "related_owasp_refs": ["OWASP-A05"],
+      "affected_technology_patterns": [],
+      "affected_surface_patterns": [],
+      "detection_signals": ["cors wildcard with credentials", "access-control-allow-origin wildcard credentials"],
+      "remediation_summary": "Restrict allowed origins and avoid combining broad origins with credentialed browser requests.",
+      "safe_next_steps": ["Confirm intended CORS trust boundaries with the application owner."],
+      "tags": ["cors", "secure-configuration", "api"],
+      "metadata": {"fixture_only": true}
+    },
+    {
+      "record_id": "owasp-api-auth-indicator-review",
+      "record_type": "owasp",
+      "title": "API Surface Without Clear Auth Indicators",
+      "summary": "Imported API-like paths without authentication indicators should be reviewed as an inventory and authorization design question.",
+      "category": "api_authorization_review",
+      "severity_hint": "medium",
+      "confidence": "low",
+      "references": ["OWASP API Security Top 10 API1/API2 review area"],
+      "related_cwe_ids": ["CWE-862", "CWE-863"],
+      "related_owasp_refs": ["OWASP-API1", "OWASP-API2"],
+      "affected_technology_patterns": [],
+      "affected_surface_patterns": ["api-surface", "api"],
+      "detection_signals": ["api surface", "api_surface", "without auth indicators", "api_surface_auth_review"],
+      "remediation_summary": "Confirm whether imported API endpoints require authentication or explicit public access.",
+      "safe_next_steps": ["Review API inventory and documented authentication requirements before any live validation."],
+      "tags": ["api", "authorization-review"],
+      "metadata": {"fixture_only": true}
+    }
+  ]
+}

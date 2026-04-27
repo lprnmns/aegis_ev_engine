@@ -1,0 +1,42 @@
+{
+  "records": [
+    {
+      "record_id": "cwe-693-missing-security-control",
+      "record_type": "cwe",
+      "title": "Protection Mechanism Failure",
+      "summary": "Missing browser security controls can map to a broad protection mechanism weakness category for triage.",
+      "category": "security_control",
+      "severity_hint": "medium",
+      "confidence": "medium",
+      "references": ["CWE-693"],
+      "related_cwe_ids": ["CWE-693"],
+      "related_owasp_refs": ["OWASP-A05"],
+      "affected_technology_patterns": [],
+      "affected_surface_patterns": [],
+      "detection_signals": ["content-security-policy", "x-content-type-options", "permissions-policy", "referrer-policy"],
+      "remediation_summary": "Add the missing defense-in-depth control where appropriate for the application context.",
+      "safe_next_steps": ["Validate expected browser security controls from supplied metadata and owner documentation."],
+      "tags": ["secure-configuration", "security-control"],
+      "metadata": {"fixture_only": true}
+    },
+    {
+      "record_id": "cwe-1021-clickjacking-control",
+      "record_type": "cwe",
+      "title": "Improper Restriction of Rendered UI Layers or Frames",
+      "summary": "Missing frame restrictions should be reviewed when administrative, login, or account surfaces are present.",
+      "category": "clickjacking_protection",
+      "severity_hint": "medium",
+      "confidence": "medium",
+      "references": ["CWE-1021"],
+      "related_cwe_ids": ["CWE-1021"],
+      "related_owasp_refs": ["OWASP-A05"],
+      "affected_technology_patterns": [],
+      "affected_surface_patterns": ["admin-surface", "auth-surface", "login"],
+      "detection_signals": ["x-frame-options", "frame-ancestors", "clickjacking controls absent", "clickjacking"],
+      "remediation_summary": "Set frame restrictions with Content-Security-Policy frame-ancestors or an equivalent policy for legacy clients.",
+      "safe_next_steps": ["Confirm intended framing behavior before recommending enforcement changes."],
+      "tags": ["clickjacking", "secure-configuration", "admin-surface"],
+      "metadata": {"fixture_only": true}
+    }
+  ]
+}
