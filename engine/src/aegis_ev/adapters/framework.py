@@ -195,6 +195,30 @@ class ApiImportAdapter(SafeToolAdapter):
         return f"Import supplied {request.action.removeprefix('import_')} JSON locally without network access."
 
 
+class SafeHttpFetchAdapter(SafeToolAdapter):
+    """Policy-gated passive HTTP metadata collection adapter."""
+
+    metadata = AdapterMetadata(
+        adapter_id="safe_http_fetch",
+        display_name="Safe HTTP Metadata Fetch Adapter",
+        description="Collects low-impact HTTP response metadata from explicitly scoped targets.",
+        supported_actions=("fetch_and_analyze_headers", "fetch_metadata"),
+        default_impact_level=ImpactLevel.GREEN,
+        requires_network=True,
+        requires_authentication=False,
+        allowed_target_types=("url",),
+        allowed_argument_schema={"request": "object"},
+        timeout_seconds=5,
+        max_requests=1,
+        max_concurrency=1,
+        produces_evidence=True,
+        safe_mode_supported=True,
+    )
+
+    def execution_preview(self, request: ToolActionRequest, sanitized_arguments: dict[str, Any]) -> str:
+        return "Collect passive HTTP metadata with strict policy, redirect, timeout, and no-body controls."
+
+
 @dataclass
 class AdapterRegistry:
     _adapters: dict[str, SafeToolAdapter] = field(default_factory=dict)
@@ -376,6 +400,7 @@ def default_registry() -> AdapterRegistry:
     registry = AdapterRegistry()
     registry.register(ApiImportAdapter())
     registry.register(EchoPlanAdapter())
+    registry.register(SafeHttpFetchAdapter())
     registry.register(WebHeaderConfigCheckAdapter())
     return registry
 

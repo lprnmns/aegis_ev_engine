@@ -34,6 +34,8 @@ MACHINE_COMMANDS = (
     "link-project-reference",
     "run-demo-flow",
     "demo-flow",
+    "fetch-http-metadata",
+    "fetch-and-analyze-headers",
 )
 
 

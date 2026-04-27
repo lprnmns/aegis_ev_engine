@@ -11,6 +11,7 @@ from aegis_ev.adapters import (
     ApiImportAdapter,
     DuplicateAdapterError,
     EchoPlanAdapter,
+    SafeHttpFetchAdapter,
     ToolActionRequest,
     UnknownAdapterError,
     WebHeaderConfigCheckAdapter,
@@ -190,7 +191,10 @@ class AdapterFrameworkTests(unittest.TestCase):
 
     def test_registry_list_behavior(self):
         adapters = default_registry().list_adapters()
-        self.assertEqual([adapter.adapter_id for adapter in adapters], ["api_import", "echo_plan", "web_header_config_check"])
+        self.assertEqual(
+            [adapter.adapter_id for adapter in adapters],
+            ["api_import", "echo_plan", "safe_http_fetch", "web_header_config_check"],
+        )
 
     def test_no_network_side_effects(self):
         plan = AdapterPlanner(default_registry()).plan(request())
@@ -244,6 +248,35 @@ class AdapterFrameworkTests(unittest.TestCase):
     def test_api_import_adapter_rejects_invalid_input(self):
         plan = AdapterPlanner(default_registry()).plan(
             request(adapter_id="api_import", action="import_openapi", arguments={"data": "not-object"})
+        )
+        self.assertFalse(plan.allowed)
+        self.assertEqual(plan.decision_code, "invalid_arguments")
+
+    def test_safe_http_fetch_adapter_registered_and_safe(self):
+        adapter = default_registry().get("safe_http_fetch")
+        self.assertIsInstance(adapter, SafeHttpFetchAdapter)
+        self.assertTrue(adapter.metadata.requires_network)
+        self.assertTrue(adapter.metadata.safe_mode_supported)
+        self.assertEqual(adapter.metadata.default_impact_level, ImpactLevel.GREEN)
+
+    def test_safe_http_fetch_adapter_dry_run_produces_plan_without_network(self):
+        plan = AdapterPlanner(default_registry()).plan(
+            request(adapter_id="safe_http_fetch", action="fetch_metadata", arguments={"request": {"method": "HEAD"}})
+        )
+        self.assertTrue(plan.allowed)
+        self.assertTrue(plan.dry_run)
+        self.assertIn("--dry-run", plan.command_preview)
+
+    def test_safe_http_fetch_adapter_rejects_unsupported_action(self):
+        plan = AdapterPlanner(default_registry()).plan(
+            request(adapter_id="safe_http_fetch", action="crawl", arguments={"request": {"method": "HEAD"}})
+        )
+        self.assertFalse(plan.allowed)
+        self.assertEqual(plan.decision_code, "unsupported_action")
+
+    def test_safe_http_fetch_adapter_rejects_invalid_arguments(self):
+        plan = AdapterPlanner(default_registry()).plan(
+            request(adapter_id="safe_http_fetch", action="fetch_metadata", arguments={"request": "not-object"})
         )
         self.assertFalse(plan.allowed)
         self.assertEqual(plan.decision_code, "invalid_arguments")
