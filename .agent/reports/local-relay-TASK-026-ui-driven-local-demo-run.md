@@ -1,3 +1,10 @@
+# Local Relay Report: TASK-026-ui-driven-local-demo-run
+
+Updated: 2026-04-28T13:39:57.075368+00:00
+
+## State
+
+```json
 {
   "task_id": "TASK-026-ui-driven-local-demo-run",
   "branch": "feat/TASK-026-ui-driven-local-demo-run",
@@ -10,3 +17,8 @@
   "next_actor": "done",
   "blocked": false
 }
+```
+
+## Events
+
+- Gemini verdict: `PASS`.
