@@ -1,0 +1,12 @@
+{
+  "results": [
+    {
+      "check_id": "python.lang.security.sample-rule",
+      "path": "src/example.py",
+      "severity": "low",
+      "extra": {
+        "message": "Sample static analysis candidate for local fixture testing."
+      }
+    }
+  ]
+}

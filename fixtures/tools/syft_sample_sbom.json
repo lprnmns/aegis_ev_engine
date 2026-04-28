@@ -1,0 +1,14 @@
+{
+  "artifacts": [
+    {
+      "name": "example-web-package",
+      "version": "1.2.3",
+      "type": "python"
+    },
+    {
+      "name": "example-frontend-package",
+      "version": "4.5.6",
+      "type": "npm"
+    }
+  ]
+}

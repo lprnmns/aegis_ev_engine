@@ -1,0 +1,9 @@
+{
+  "tool_id": "builtin_safe_http_fetch",
+  "action": "fetch_metadata",
+  "target": "https://portfolio.example.test",
+  "dry_run": true,
+  "arguments": {
+    "method": "HEAD"
+  }
+}
