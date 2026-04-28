@@ -37,6 +37,8 @@ class EvidenceSourceType(str, Enum):
     RECON_PLANNER = "recon_planner"
     TOOL_ADAPTER = "tool_adapter"
     REMEDIATION_RETEST = "remediation_retest"
+    AI_CONTRACT_VALIDATION = "ai_contract_validation"
+    AI_PLANNER_CONTRACT = "ai_planner_contract"
     AUDIT = "audit"
     HUMAN = "human"
     AI_VERIFIER = "ai_verifier"

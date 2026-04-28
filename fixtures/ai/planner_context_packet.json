@@ -1,0 +1,61 @@
+{
+  "project_id": "project_demo_ai_contract",
+  "target": "https://portfolio.example.test",
+  "normalized_target": "https://portfolio.example.test",
+  "scope_summary": {
+    "allowed_domains": ["portfolio.example.test"],
+    "allowed_schemes": ["https"],
+    "environment": "production"
+  },
+  "policy_summary": {
+    "safe_mode": true,
+    "allowed_impact_levels": ["green"],
+    "approval_required_for": ["amber", "red"]
+  },
+  "attack_surface_summary": {
+    "target_count": 1,
+    "technology_count": 2,
+    "missing_controls": ["Content-Security-Policy"]
+  },
+  "fingerprint_summary": {
+    "detected_frameworks": ["Next.js"],
+    "detected_platforms": ["Vercel"],
+    "confidence": "high"
+  },
+  "vulnerability_intel_summary": {
+    "match_count": 2,
+    "priority_hints": ["missing_security_control"]
+  },
+  "recon_plan_summary": {
+    "step_count": 2,
+    "blocked_count": 0
+  },
+  "evidence": [
+    {
+      "evidence_id": "evidence_demo_header_csp",
+      "source_type": "web_header_check",
+      "summary": "Content-Security-Policy was absent in supplied metadata."
+    },
+    {
+      "evidence_id": "evidence_demo_fingerprint",
+      "source_type": "technology_fingerprint",
+      "summary": "Passive metadata indicated framework and platform hints."
+    }
+  ],
+  "findings": [
+    {
+      "finding_id": "finding_demo_missing_csp",
+      "status": "candidate",
+      "verification_state": "evidence_backed",
+      "evidence_ids": ["evidence_demo_header_csp"]
+    }
+  ],
+  "tool_capability_summary": {
+    "available_builtin_capabilities": ["builtin_safe_header_analysis", "builtin_passive_fingerprint"]
+  },
+  "metadata": {
+    "fixture": true,
+    "no_model_call": true,
+    "no_tool_execution": true
+  }
+}

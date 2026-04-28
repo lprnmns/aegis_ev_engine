@@ -7,6 +7,16 @@ from pathlib import Path
 from typing import Any
 
 from .adapters import AdapterPlanner, ToolActionRequest, UnknownAdapterError, default_registry
+from .ai_contracts import (
+    build_planner_prompt_packet,
+    build_reporter_prompt_packet,
+    build_verifier_prompt_packet,
+    evidence_from_ai_validation,
+    evidence_from_prompt_packet,
+    validate_planner_output,
+    validate_reporter_output,
+    validate_verifier_output,
+)
 from .attack_surface import build_attack_surface_graph, evidence_from_attack_surface_graph, attack_surface_report_section
 from .approvals import (
     ApprovalActorType,
@@ -254,6 +264,18 @@ def run_contract_command(command: str, payload: dict[str, Any]) -> CommandRespon
             return create_retest_plan_command(payload)
         if command == "compare-retest-results":
             return compare_retest_results_command(payload)
+        if command == "build-ai-planner-packet":
+            return build_ai_planner_packet_command(payload)
+        if command == "validate-ai-planner-output":
+            return validate_ai_planner_output_command(payload)
+        if command == "build-ai-verifier-packet":
+            return build_ai_verifier_packet_command(payload)
+        if command == "validate-ai-verifier-output":
+            return validate_ai_verifier_output_command(payload)
+        if command == "build-ai-reporter-packet":
+            return build_ai_reporter_packet_command(payload)
+        if command == "validate-ai-reporter-output":
+            return validate_ai_reporter_output_command(payload)
         return failure(command, "unsupported_command", f"Unsupported command: {command}")
     except (KeyError, TypeError, ValueError) as exc:
         return failure(command, "invalid_request", str(exc))
@@ -954,6 +976,51 @@ def compare_retest_results_command(payload: dict[str, Any]) -> CommandResponse:
         },
         warnings=list(result.warnings),
     )
+
+
+def build_ai_planner_packet_command(payload: dict[str, Any]) -> CommandResponse:
+    packet = build_planner_prompt_packet(payload)
+    evidence = evidence_from_prompt_packet(packet)
+    return success("build-ai-planner-packet", {"packet": packet, "evidence": evidence.to_dict()})
+
+
+def build_ai_verifier_packet_command(payload: dict[str, Any]) -> CommandResponse:
+    packet = build_verifier_prompt_packet(payload)
+    evidence = evidence_from_prompt_packet(packet)
+    return success("build-ai-verifier-packet", {"packet": packet, "evidence": evidence.to_dict()})
+
+
+def build_ai_reporter_packet_command(payload: dict[str, Any]) -> CommandResponse:
+    packet = build_reporter_prompt_packet(payload)
+    evidence = evidence_from_prompt_packet(packet)
+    return success("build-ai-reporter-packet", {"packet": packet, "evidence": evidence.to_dict()})
+
+
+def validate_ai_planner_output_command(payload: dict[str, Any]) -> CommandResponse:
+    result = validate_planner_output(payload)
+    evidence = evidence_from_ai_validation(result)
+    body = {"validation": result.to_dict(), "evidence": evidence.to_dict()}
+    if not result.valid:
+        return failure("validate-ai-planner-output", "ai_validation_failed", "AI planner output failed guardrail validation", details=body, warnings=list(result.warnings))
+    return success("validate-ai-planner-output", body, warnings=list(result.warnings))
+
+
+def validate_ai_verifier_output_command(payload: dict[str, Any]) -> CommandResponse:
+    result = validate_verifier_output(payload)
+    evidence = evidence_from_ai_validation(result)
+    body = {"validation": result.to_dict(), "evidence": evidence.to_dict()}
+    if not result.valid:
+        return failure("validate-ai-verifier-output", "ai_validation_failed", "AI verifier output failed guardrail validation", details=body, warnings=list(result.warnings))
+    return success("validate-ai-verifier-output", body, warnings=list(result.warnings))
+
+
+def validate_ai_reporter_output_command(payload: dict[str, Any]) -> CommandResponse:
+    result = validate_reporter_output(payload)
+    evidence = evidence_from_ai_validation(result)
+    body = {"validation": result.to_dict(), "evidence": evidence.to_dict()}
+    if not result.valid:
+        return failure("validate-ai-reporter-output", "ai_validation_failed", "AI reporter output failed guardrail validation", details=body, warnings=list(result.warnings))
+    return success("validate-ai-reporter-output", body, warnings=list(result.warnings))
 
 
 def verify_audit(payload: dict[str, Any]) -> CommandResponse:

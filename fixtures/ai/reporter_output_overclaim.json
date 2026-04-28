@@ -1,0 +1,17 @@
+{
+  "output_id": "reporter_output_demo_overclaim",
+  "role": "reporter",
+  "executive_summary": "A complete penetration test with full coverage was completed.",
+  "technical_summary": "The report claims confirmed exploitability even though only supplied metadata exists.",
+  "finding_narratives": [
+    {
+      "finding_id": "finding_demo_missing_csp",
+      "status": "candidate",
+      "evidence_ids": ["evidence_demo_header_csp"]
+    }
+  ],
+  "remediation_summary": "Apply defensive response headers.",
+  "retest_summary": "Retest with safe metadata.",
+  "limitations": [],
+  "confidence": "high"
+}
