@@ -1,3 +1,10 @@
+# Local Relay Report: TASK-021-remediation-retest-workflow
+
+Updated: 2026-04-28T12:09:01.515416+00:00
+
+## State
+
+```json
 {
   "task_id": "TASK-021-remediation-retest-workflow",
   "branch": "feat/TASK-021-remediation-retest-workflow",
@@ -10,3 +17,8 @@
   "next_actor": "done",
   "blocked": false
 }
+```
+
+## Events
+
+- Gemini verdict: `PASS`.
