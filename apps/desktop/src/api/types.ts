@@ -46,4 +46,14 @@ export interface LocalDemoSummary {
   evidence_count?: number;
   finding_count?: number;
   reports?: Record<string, unknown>;
+  project_summary?: Record<string, unknown>;
+  target_scope_summary?: Record<string, unknown>;
+  pipeline_stage_summaries?: Array<Record<string, unknown>>;
+  evidence_summaries?: Array<Record<string, unknown>>;
+  finding_summaries?: Array<Record<string, unknown>>;
+  report_summaries?: Array<Record<string, unknown>>;
+  audit_verification_status?: Record<string, unknown>;
+  safety_flags?: Record<string, unknown>;
+  warnings?: string[];
+  errors?: string[];
 }

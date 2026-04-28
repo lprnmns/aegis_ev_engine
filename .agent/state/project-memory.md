@@ -43,7 +43,7 @@ Aegis EV uses a local-first architecture:
 
 ## Current Task
 
-TASK-025 Tauri Python sidecar bridge stub.
+TASK-026 UI-driven local no-network demo run.
 
 ## Open Decisions
 
@@ -80,4 +80,5 @@ TASK-025 Tauri Python sidecar bridge stub.
 - TASK-022 adds provider-agnostic AI planner/verifier/reporter contract models, prompt packet builders, response validators, guardrail checks, evidence/audit helpers, fixtures, tests, and CLI/API commands without live model calls, provider APIs, API keys, autonomous tool execution, or unsafe validation behavior.
 - TASK-023 adds provider-agnostic model provider profiles, mock-only routing policy, request/response envelopes, offline mock provider execution, TASK-022 guardrail validation hooks, evidence/audit helpers, fixtures, tests, and CLI/API commands without live provider calls, API keys, account-auth access, network behavior, or autonomous tool execution.
 - TASK-024 adds the first Tauri-compatible desktop UI shell with React/TypeScript mock screens, static UI types, placeholder-only data, Tauri config without sidecar/shell permissions, and lightweight validation without live engine execution, model calls, external tools, or real portfolio URL.
-- TASK-025 is adding a safe Tauri-to-Python bridge stub with fixed allowlisted no-network engine commands, structured JSON responses, UI connection state, mock fallback outside Tauri, and no live portfolio execution, live HTTP fetch, arbitrary shell passthrough, external tool execution, model calls, API keys, or real portfolio URL.
+- TASK-025 adds a safe Tauri-to-Python bridge stub with fixed allowlisted no-network engine commands, structured JSON responses, UI connection state, mock fallback outside Tauri, and no live portfolio execution, live HTTP fetch, arbitrary shell passthrough, external tool execution, model calls, API keys, or real portfolio URL.
+- TASK-026 is adding UI-driven local no-network demo execution through the safe bridge, rendering project/scope/pipeline/finding/evidence/report summaries from committed fixtures only without live portfolio execution, live HTTP fetch, external tools, model calls, API keys, or real portfolio URL.

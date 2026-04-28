@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { runLocalDemoFlow } from "./api/engineClient";
 import { StatusChip } from "./components/StatusChip";
 import { SummaryCard } from "./components/SummaryCard";
 import { EngineConnectionPanel } from "./components/EngineConnectionPanel";
@@ -10,11 +11,22 @@ import {
   findings,
   pipelineStages,
   projectSummary,
+  reportRows,
   reconSteps,
   remediation,
   targetScope
 } from "./mockData";
-import type { PipelineStage, ReconStepSummary, StatusTone } from "./types";
+import type {
+  EvidenceSummary,
+  FindingSummary,
+  LocalDemoRunSummary,
+  PipelineStage,
+  ProjectSummary,
+  ReconStepSummary,
+  ReportSummary,
+  StatusTone,
+  TargetScopeSummary
+} from "./types";
 
 const navItems = [
   "Overview",
@@ -48,7 +60,29 @@ function toneForImpact(step: ReconStepSummary): StatusTone {
 
 export default function App() {
   const [active, setActive] = useState<NavItem>("Overview");
-  const totalWarnings = useMemo(() => pipelineStages.reduce((count, stage) => count + stage.warnings.length, 0), []);
+  const [demoRun, setDemoRun] = useState<LocalDemoRunSummary | null>(null);
+  const [demoStatus, setDemoStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [demoError, setDemoError] = useState<string | null>(null);
+  const activeProject = demoRun?.project ?? projectSummary;
+  const activeScope = demoRun?.targetScope ?? targetScope;
+  const activeStages = demoRun?.pipelineStages ?? pipelineStages;
+  const activeFindings = demoRun?.findings ?? findings;
+  const activeEvidence = demoRun?.evidenceRows ?? evidenceRows;
+  const activeReports = demoRun?.reports ?? reportRows;
+  const totalWarnings = useMemo(() => activeStages.reduce((count, stage) => count + stage.warnings.length, 0), [activeStages]);
+
+  async function handleRunLocalDemo() {
+    setDemoStatus("loading");
+    setDemoError(null);
+    try {
+      const result = await runLocalDemoFlow();
+      setDemoRun(result.demo);
+      setDemoStatus("success");
+    } catch (error) {
+      setDemoError(error instanceof Error ? error.message : "Local demo failed");
+      setDemoStatus("error");
+    }
+  }
 
   return (
     <div className="app-shell">
@@ -80,8 +114,8 @@ export default function App() {
           <div className="topbar__status">
             <StatusChip label="Safe Mode Enabled" tone="good" />
             <StatusChip label="Owner-Attested Scope" tone="info" />
-            <StatusChip label="Mock UI Only" tone="neutral" />
-            <StatusChip label="Audit Valid" tone="good" />
+            <StatusChip label={demoRun ? "Local Demo Loaded" : "Mock Fallback Ready"} tone={demoRun ? "good" : "neutral"} />
+            <StatusChip label={activeProject.auditStatus === "valid" ? "Audit Valid" : "Audit Pending"} tone={activeProject.auditStatus === "valid" ? "good" : "neutral"} />
           </div>
         </header>
 
@@ -93,15 +127,24 @@ export default function App() {
             </div>
             <StatusChip label="No scans or model calls" tone="good" />
           </div>
-          {active === "Overview" && <Overview totalWarnings={totalWarnings} />}
-          {active === "Target & Scope" && <TargetScope />}
-          {active === "Operator Pipeline" && <OperatorPipeline />}
-          {active === "Findings" && <Findings />}
-          {active === "Evidence" && <Evidence />}
+          {active === "Overview" && (
+            <Overview
+              totalWarnings={totalWarnings}
+              project={activeProject}
+              demoRun={demoRun}
+              demoStatus={demoStatus}
+              demoError={demoError}
+              onRunLocalDemo={handleRunLocalDemo}
+            />
+          )}
+          {active === "Target & Scope" && <TargetScope scope={activeScope} />}
+          {active === "Operator Pipeline" && <OperatorPipeline stages={activeStages} />}
+          {active === "Findings" && <Findings findings={activeFindings} />}
+          {active === "Evidence" && <Evidence evidenceRows={activeEvidence} />}
           {active === "Attack Surface" && <AttackSurface />}
           {active === "Recon Plan" && <ReconPlan />}
           {active === "Remediation & Retest" && <RemediationRetest />}
-          {active === "Reports" && <Reports />}
+          {active === "Reports" && <Reports reports={activeReports} />}
           {active === "Approvals" && <Approvals />}
           {active === "AI Guardrails" && <AIGuardrails />}
           {active === "Settings" && <Settings />}
@@ -111,24 +154,64 @@ export default function App() {
   );
 }
 
-function Overview({ totalWarnings }: { totalWarnings: number }) {
+function Overview({
+  totalWarnings,
+  project,
+  demoRun,
+  demoStatus,
+  demoError,
+  onRunLocalDemo
+}: {
+  totalWarnings: number;
+  project: ProjectSummary;
+  demoRun: LocalDemoRunSummary | null;
+  demoStatus: "idle" | "loading" | "success" | "error";
+  demoError: string | null;
+  onRunLocalDemo: () => void;
+}) {
   return (
     <>
       <div className="summary-grid">
-        <SummaryCard title="Project" value={projectSummary.projectName} detail={projectSummary.targetUrl} />
+        <SummaryCard title="Project" value={project.projectName} detail={project.targetUrl} />
         <SummaryCard title="Safe Mode" value="Enabled" detail="Low-impact workflows only" />
-        <SummaryCard title="Authorization" value="Owner-attested" detail={projectSummary.environment} />
-        <SummaryCard title="Live Request" value="Mock" detail="No live sidecar call from UI" />
-        <SummaryCard title="Candidate Findings" value={projectSummary.findingCount} detail="Not confirmed exploitability" />
-        <SummaryCard title="Evidence" value={projectSummary.evidenceCount} detail="Redacted, body-free" />
-        <SummaryCard title="Audit" value="Valid" detail="Mock verification status" />
-        <SummaryCard title="Pipeline" value="Ready" detail={`${totalWarnings} safety notes`} />
+        <SummaryCard title="Authorization" value="Owner-attested" detail={project.environment} />
+        <SummaryCard title="Live Request" value="None" detail="Local fixture flow only" />
+        <SummaryCard title="Candidate Findings" value={project.findingCount} detail="Not confirmed exploitability" />
+        <SummaryCard title="Evidence" value={project.evidenceCount} detail="Redacted, body-free" />
+        <SummaryCard title="Audit" value={project.auditStatus === "valid" ? "Valid" : "Pending"} detail={demoRun?.auditStatus ?? "Mock verification status"} />
+        <SummaryCard title="Pipeline" value={project.pipelineStatus} detail={`${totalWarnings} safety notes`} />
       </div>
+      <section className="panel local-demo-panel">
+        <div className="panel-row">
+          <div>
+            <h3>Local No-Network Demo</h3>
+            <p>Run the committed fixture flow through the safe bridge and update this UI with structured engine summaries.</p>
+          </div>
+          <div className="list-card__chips">
+            <StatusChip label="no live target request" tone="good" />
+            <StatusChip label="no scanner/crawler/fuzzer" tone="good" />
+            <StatusChip label="no model call" tone="good" />
+          </div>
+        </div>
+        <button className="primary-action" onClick={onRunLocalDemo} disabled={demoStatus === "loading"}>
+          {demoStatus === "loading" ? "Running Local Demo..." : "Run Local Demo"}
+        </button>
+        <StatusChip label={demoStatus} tone={demoStatus === "error" ? "danger" : demoStatus === "success" ? "good" : "neutral"} />
+        {demoError ? <p className="error-text">{demoError}</p> : null}
+        {demoRun ? (
+          <div className="demo-result-strip">
+            <span>Evidence: {demoRun.project.evidenceCount}</span>
+            <span>Candidate findings: {demoRun.project.findingCount}</span>
+            <span>Audit: {demoRun.auditStatus}</span>
+            <span>Reports: {demoRun.reports.length}</span>
+          </div>
+        ) : null}
+      </section>
       <section className="panel">
         <h3>Operator Readiness</h3>
         <p>
-          This shell presents the full Aegis EV workflow from scoped target setup through remediation and retest. It is a non-executing UI layer:
-          no sidecar, scanner, crawler, external tool, or model provider is called.
+          This shell presents the full Aegis EV workflow from scoped target setup through remediation and retest. TASK-026 allows only
+          the local fixture demo bridge command; no live portfolio run, scanner, crawler, external tool, or model provider is called.
         </p>
       </section>
       <EngineConnectionPanel />
@@ -136,27 +219,27 @@ function Overview({ totalWarnings }: { totalWarnings: number }) {
   );
 }
 
-function TargetScope() {
+function TargetScope({ scope }: { scope: TargetScopeSummary }) {
   return (
     <div className="two-column">
       <section className="panel">
         <h3>Allowed Scope</h3>
         <dl className="definition-list">
           <dt>Domain</dt>
-          <dd>{targetScope.allowedDomain}</dd>
+          <dd>{scope.allowedDomain}</dd>
           <dt>Schemes</dt>
-          <dd>{targetScope.allowedSchemes.join(", ")}</dd>
+          <dd>{scope.allowedSchemes.join(", ")}</dd>
           <dt>Environment</dt>
-          <dd>{targetScope.environment}</dd>
+          <dd>{scope.environment}</dd>
           <dt>Attestation</dt>
-          <dd>{targetScope.attestation}</dd>
+          <dd>{scope.attestation}</dd>
         </dl>
       </section>
       <section className="panel panel--muted">
         <h3>Denied Example</h3>
-        <p className="mono">{targetScope.outOfScopeExample}</p>
+        <p className="mono">{scope.outOfScopeExample}</p>
         <ul className="plain-list">
-          {targetScope.notes.map((note) => (
+          {scope.notes.map((note) => (
             <li key={note}>{note}</li>
           ))}
         </ul>
@@ -165,10 +248,10 @@ function TargetScope() {
   );
 }
 
-function OperatorPipeline() {
+function OperatorPipeline({ stages }: { stages: PipelineStage[] }) {
   return (
     <div className="stage-grid">
-      {pipelineStages.map((stage) => (
+      {stages.map((stage) => (
         <section key={stage.id} className="panel stage-panel">
           <div className="panel-row">
             <h3>{stage.name}</h3>
@@ -189,7 +272,7 @@ function OperatorPipeline() {
   );
 }
 
-function Findings() {
+function Findings({ findings }: { findings: FindingSummary[] }) {
   return (
     <section className="panel">
       <DataTable
@@ -207,7 +290,7 @@ function Findings() {
   );
 }
 
-function Evidence() {
+function Evidence({ evidenceRows }: { evidenceRows: EvidenceSummary[] }) {
   return (
     <section className="panel">
       <DataTable
@@ -287,16 +370,12 @@ function RemediationRetest() {
   );
 }
 
-function Reports() {
+function Reports({ reports }: { reports: ReportSummary[] }) {
   return (
     <section className="panel">
       <DataTable
         columns={["Report", "Format", "Status", "Notes"]}
-        rows={[
-          ["Portfolio Operator Summary", "Markdown", "mock-ready", "Evidence-backed narrative only"],
-          ["Portfolio Operator Data", "JSON", "mock-ready", "Structured output for UI integration"],
-          ["Audit Chain", "JSONL", "mock-valid", "No PDF generation in this task"]
-        ]}
+        rows={reports.map((report) => [report.title, report.format, report.status, report.path ? `${report.summary} (${report.path})` : report.summary])}
       />
     </section>
   );

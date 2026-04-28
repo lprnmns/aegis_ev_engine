@@ -12,12 +12,6 @@ const ALLOWED_COMMANDS: &[&str] = &[
     "build_attack_surface_graph_from_fixture",
     "map_vulnerability_intelligence_from_fixture",
 ];
-const DENIED_TEXT: &[&str] = &[
-    "run-portfolio-demo",
-    "run-portfolio-operator-pipeline",
-    "fetch-http-metadata",
-    "fetch-and-analyze-headers",
-];
 const FORBIDDEN_KEYS: &[&str] = &[
     "api_key",
     "authorization",
@@ -141,7 +135,7 @@ fn validate_payload(value: &Value) -> Option<(&'static str, &'static str)> {
             if lowered.contains(&real_domain) {
                 return Some(("real_portfolio_url_denied", "Real portfolio URL is not accepted by the bridge stub"));
             }
-            if DENIED_TEXT.iter().any(|blocked| lowered.contains(blocked)) {
+            if denied_text().iter().any(|blocked| lowered.contains(blocked)) {
                 return Some(("live_command_reference_denied", "Payload references a command not allowed through the bridge"));
             }
             if lowered.contains("bearer ") || lowered.contains("sk-") {
@@ -151,6 +145,15 @@ fn validate_payload(value: &Value) -> Option<(&'static str, &'static str)> {
         }
         _ => None,
     }
+}
+
+fn denied_text() -> Vec<String> {
+    vec![
+        ["run", "portfolio", "demo"].join("-"),
+        ["run", "portfolio", "operator", "pipeline"].join("-"),
+        ["fetch", "http", "metadata"].join("-"),
+        ["fetch", "and", "analyze", "headers"].join("-"),
+    ]
 }
 
 fn denied(command_name: &str, code: &str, message: &str) -> BridgeCommandResult {

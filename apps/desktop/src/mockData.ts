@@ -4,6 +4,7 @@ import type {
   AttackSurfaceSummary,
   EvidenceSummary,
   FindingSummary,
+  ReportSummary,
   PipelineStage,
   ProjectSummary,
   ReconStepSummary,
@@ -209,6 +210,30 @@ export const evidenceRows: EvidenceSummary[] = [
     summary: "Green-only next steps plus blocked future actions.",
     redactionApplied: true,
     bodyStored: false
+  }
+];
+
+export const reportRows: ReportSummary[] = [
+  {
+    title: "Portfolio Operator Summary",
+    format: "markdown",
+    status: "mock-ready",
+    path: null,
+    summary: "Evidence-backed narrative only"
+  },
+  {
+    title: "Portfolio Operator Data",
+    format: "json",
+    status: "mock-ready",
+    path: null,
+    summary: "Structured output for UI integration"
+  },
+  {
+    title: "Audit Chain",
+    format: "jsonl",
+    status: "mock-valid",
+    path: null,
+    summary: "No PDF generation in this task"
   }
 ];
 
