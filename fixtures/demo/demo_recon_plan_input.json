@@ -1,0 +1,37 @@
+{
+  "created_at_utc": "2026-01-01T00:00:00+00:00",
+  "target": "https://portfolio.example.test",
+  "environment": "staging",
+  "planner_mode": "conservative",
+  "project": {
+    "project_id": "project_demo_recon",
+    "name": "Portfolio Placeholder Recon",
+    "environment": "staging"
+  },
+  "fetch_result": {
+    "target": "https://portfolio.example.test",
+    "normalized_target": "https://portfolio.example.test",
+    "status_code": 200,
+    "headers": {
+      "Server": "Vercel",
+      "Strict-Transport-Security": "max-age=31536000"
+    },
+    "no_body_stored": true
+  },
+  "evidence": [
+    {
+      "evidence_id": "evidence_fetch_1",
+      "source_type": "safe_http_fetch",
+      "title": "Safe fetch metadata"
+    }
+  ],
+  "findings": [
+    {
+      "finding_id": "finding_candidate_1",
+      "title": "Candidate missing CSP",
+      "status": "candidate",
+      "retest_status": "not_retested",
+      "evidence_ids": ["evidence_fetch_1"]
+    }
+  ]
+}

@@ -43,7 +43,7 @@ Aegis EV uses a local-first architecture:
 
 ## Current Task
 
-TASK-017 vulnerability intelligence mapping.
+TASK-018 safe recon planner.
 
 ## Open Decisions
 
@@ -73,3 +73,4 @@ TASK-017 vulnerability intelligence mapping.
 - TASK-015 adds passive technology fingerprinting from supplied HTTP metadata, capped HTML snippets, asset path hints, and imported endpoint inventory, producing evidence and risk hypotheses without crawling, asset fetching, scanners, AI verification, or confirmed vulnerability claims.
 - TASK-016 adds a deterministic attack surface graph that connects projects, targets, endpoints, technologies, controls, evidence, candidate findings, and risk hypotheses from supplied safe data without network, crawling, scanners, or confirmed vulnerability claims.
 - TASK-017 adds offline-first vulnerability intelligence mapping from supplied attack surface and fingerprint signals to local OWASP/CWE/CVE-style/KEV-style/EPSS-style knowledge records, producing conservative knowledge matches and evidence without live feed ingestion, network access, intrusive validation, or confirmed vulnerability claims.
+- TASK-018 adds a deterministic safe recon planner that converts supplied graph, fingerprint, vulnerability intelligence, evidence, and finding context into policy-aware planning recommendations without executing tools, crawling, fuzzing, scanners, live feed lookups, or active validation.
