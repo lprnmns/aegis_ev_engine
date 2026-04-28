@@ -43,7 +43,7 @@ Aegis EV uses a local-first architecture:
 
 ## Current Task
 
-TASK-020 integrated portfolio operator pipeline.
+TASK-021 remediation and retest workflow.
 
 ## Open Decisions
 
@@ -76,3 +76,4 @@ TASK-020 integrated portfolio operator pipeline.
 - TASK-018 adds a deterministic safe recon planner that converts supplied graph, fingerprint, vulnerability intelligence, evidence, and finding context into policy-aware planning recommendations without executing tools, crawling, fuzzing, scanners, live feed lookups, or active validation.
 - TASK-019 adds green-tier tool capability metadata, dry-run argv-list planning, safe availability checks, parser contracts, and evidence/audit/recon-planner integration without executing external tools, scanners, crawlers, fuzzers, or live network behavior.
 - TASK-020 integrates the authorized portfolio operator pipeline across safe fetch, header checks, passive fingerprinting, attack surface graphing, offline vulnerability intelligence mapping, safe recon planning, green-tier dry-run capability suggestions, evidence, audit, and Markdown/JSON reports without adding crawling, fuzzing, scanners, external tool execution, or new live behavior beyond the existing policy-gated metadata fetch.
+- TASK-021 adds deterministic defensive remediation guidance, green-impact retest planning, supplied before/after header comparison, conservative retest status updates, evidence, audit events, report sections, and CLI/API commands without scanner, crawler, fuzzer, exploit validation, external tool execution, or live retest behavior.
