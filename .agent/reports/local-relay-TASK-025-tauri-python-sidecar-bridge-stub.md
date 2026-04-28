@@ -1,3 +1,10 @@
+# Local Relay Report: TASK-025-tauri-python-sidecar-bridge-stub
+
+Updated: 2026-04-28T13:20:44.859088+00:00
+
+## State
+
+```json
 {
   "task_id": "TASK-025-tauri-python-sidecar-bridge-stub",
   "branch": "feat/TASK-025-tauri-python-sidecar-bridge-stub",
@@ -10,3 +17,8 @@
   "next_actor": "done",
   "blocked": false
 }
+```
+
+## Events
+
+- Gemini verdict: `PASS`.

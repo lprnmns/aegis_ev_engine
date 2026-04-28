@@ -5,9 +5,13 @@ const root = new URL("..", import.meta.url).pathname;
 const files = [
   "src/mockData.ts",
   "src/App.tsx",
+  "src/api/engineClient.ts",
+  "src/api/types.ts",
+  "src/components/EngineConnectionPanel.tsx",
   "src/styles.css",
   "src-tauri/tauri.conf.json",
-  "src-tauri/src/main.rs"
+  "src-tauri/src/main.rs",
+  "src-tauri/src/engine_bridge.rs"
 ];
 
 const realPortfolioDomain = ["alperenmanas", "app"].join(".");
@@ -45,7 +49,21 @@ if (!mock.includes("status: \"candidate\"")) {
 
 const tauriConfig = JSON.parse(readFileSync(join(root, "src-tauri/tauri.conf.json"), "utf8"));
 if (JSON.stringify(tauriConfig).toLowerCase().includes("sidecar")) {
-  throw new Error("Tauri config must not define sidecar execution in TASK-024");
+  throw new Error("Tauri config must not define sidecar execution in TASK-025");
 }
 
-console.log("UI shell static validation passed.");
+const bridge = readFileSync(join(root, "src-tauri/src/engine_bridge.rs"), "utf8");
+for (const blockedCommand of ["run-portfolio-demo", "run-portfolio-operator-pipeline", "fetch-http-metadata", "fetch-and-analyze-headers"]) {
+  const allowedList = bridge.match(/const ALLOWED_COMMANDS:[\s\S]*?\];/u)?.[0] ?? "";
+  if (allowedList.includes(blockedCommand)) {
+    throw new Error(`Bridge allowlist contains blocked command: ${blockedCommand}`);
+  }
+}
+if (!bridge.includes(".arg(\"-m\")") || !bridge.includes(".arg(\"aegis_ev.bridge\")")) {
+  throw new Error("Bridge must call the Python wrapper through fixed argv segments");
+}
+if (bridge.includes(".arg(command") && !bridge.includes("ALLOWED_COMMANDS.contains")) {
+  throw new Error("Bridge command argument must be protected by an allowlist");
+}
+
+console.log("UI shell and bridge static validation passed.");
