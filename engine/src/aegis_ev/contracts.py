@@ -52,6 +52,14 @@ from .fingerprinting import (
 )
 from .imports import evidence_from_import_result, import_har, import_openapi, import_postman
 from .models import AuthorizationProfile, ImpactLevel, PolicyBudget, RequestBudget, ToolIntent
+from .model_router import (
+    build_model_request_envelope,
+    evidence_from_model_routing,
+    execute_mock_model_request,
+    list_model_providers,
+    route_model_request,
+    validate_model_response_envelope,
+)
 from .policy import PolicyEngine
 from .portfolio_demo import run_portfolio_demo_from_payload
 from .projects import (
@@ -276,6 +284,16 @@ def run_contract_command(command: str, payload: dict[str, Any]) -> CommandRespon
             return build_ai_reporter_packet_command(payload)
         if command == "validate-ai-reporter-output":
             return validate_ai_reporter_output_command(payload)
+        if command == "list-model-providers":
+            return list_model_providers_command(payload)
+        if command == "build-model-request-envelope":
+            return build_model_request_envelope_command(payload)
+        if command == "route-model-request":
+            return route_model_request_command(payload)
+        if command == "execute-mock-model-request":
+            return execute_mock_model_request_command(payload)
+        if command == "validate-model-response-envelope":
+            return validate_model_response_envelope_command(payload)
         return failure(command, "unsupported_command", f"Unsupported command: {command}")
     except (KeyError, TypeError, ValueError) as exc:
         return failure(command, "invalid_request", str(exc))
@@ -1021,6 +1039,40 @@ def validate_ai_reporter_output_command(payload: dict[str, Any]) -> CommandRespo
     if not result.valid:
         return failure("validate-ai-reporter-output", "ai_validation_failed", "AI reporter output failed guardrail validation", details=body, warnings=list(result.warnings))
     return success("validate-ai-reporter-output", body, warnings=list(result.warnings))
+
+
+def list_model_providers_command(payload: dict[str, Any]) -> CommandResponse:
+    return success("list-model-providers", list_model_providers(payload))
+
+
+def build_model_request_envelope_command(payload: dict[str, Any]) -> CommandResponse:
+    request = build_model_request_envelope(payload)
+    evidence = evidence_from_model_routing(request)
+    return success("build-model-request-envelope", {"request_envelope": request.to_dict(), "evidence": evidence.to_dict()})
+
+
+def route_model_request_command(payload: dict[str, Any]) -> CommandResponse:
+    result = route_model_request(payload)
+    evidence = evidence_from_model_routing(result)
+    return success("route-model-request", result | {"evidence": evidence.to_dict()})
+
+
+def execute_mock_model_request_command(payload: dict[str, Any]) -> CommandResponse:
+    response = execute_mock_model_request(payload)
+    evidence = evidence_from_model_routing(response)
+    body = {"response_envelope": response.to_dict(), "evidence": evidence.to_dict()}
+    if response.validation_status != "passed":
+        return failure("execute-mock-model-request", "model_response_validation_failed", "Mock model response failed guardrail validation", details=body)
+    return success("execute-mock-model-request", body)
+
+
+def validate_model_response_envelope_command(payload: dict[str, Any]) -> CommandResponse:
+    response = validate_model_response_envelope(payload)
+    evidence = evidence_from_model_routing(response)
+    body = {"response_envelope": response.to_dict(), "evidence": evidence.to_dict()}
+    if response.validation_status != "passed":
+        return failure("validate-model-response-envelope", "model_response_validation_failed", "Model response envelope failed guardrail validation", details=body)
+    return success("validate-model-response-envelope", body)
 
 
 def verify_audit(payload: dict[str, Any]) -> CommandResponse:

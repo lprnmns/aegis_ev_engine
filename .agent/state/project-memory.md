@@ -43,7 +43,7 @@ Aegis EV uses a local-first architecture:
 
 ## Current Task
 
-TASK-022 AI planner, verifier, and reporter contracts.
+TASK-023 provider-agnostic model router stub.
 
 ## Open Decisions
 
@@ -78,3 +78,4 @@ TASK-022 AI planner, verifier, and reporter contracts.
 - TASK-020 integrates the authorized portfolio operator pipeline across safe fetch, header checks, passive fingerprinting, attack surface graphing, offline vulnerability intelligence mapping, safe recon planning, green-tier dry-run capability suggestions, evidence, audit, and Markdown/JSON reports without adding crawling, fuzzing, scanners, external tool execution, or new live behavior beyond the existing policy-gated metadata fetch.
 - TASK-021 adds deterministic defensive remediation guidance, green-impact retest planning, supplied before/after header comparison, conservative retest status updates, evidence, audit events, report sections, and CLI/API commands without scanner, crawler, fuzzer, exploit validation, external tool execution, or live retest behavior.
 - TASK-022 adds provider-agnostic AI planner/verifier/reporter contract models, prompt packet builders, response validators, guardrail checks, evidence/audit helpers, fixtures, tests, and CLI/API commands without live model calls, provider APIs, API keys, autonomous tool execution, or unsafe validation behavior.
+- TASK-023 adds provider-agnostic model provider profiles, mock-only routing policy, request/response envelopes, offline mock provider execution, TASK-022 guardrail validation hooks, evidence/audit helpers, fixtures, tests, and CLI/API commands without live provider calls, API keys, account-auth access, network behavior, or autonomous tool execution.

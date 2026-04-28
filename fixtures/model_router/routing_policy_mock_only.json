@@ -1,0 +1,23 @@
+{
+  "routing_policy": {
+    "policy_id": "model_routing_policy_mock_only_v1",
+    "default_provider_id": "mock_safe_provider",
+    "allowed_provider_ids": ["mock_safe_provider"],
+    "denied_provider_ids": ["future_account_cli_provider", "future_api_provider"],
+    "role_provider_preferences": {
+      "planner": ["mock_safe_provider"],
+      "verifier": ["mock_safe_provider"],
+      "reporter": ["mock_safe_provider"]
+    },
+    "allow_api_key_providers": false,
+    "allow_account_auth_providers": false,
+    "allow_network_providers": false,
+    "require_mock_for_tests": true,
+    "require_structured_output": true,
+    "require_guardrail_validation": true,
+    "max_context_items": 200,
+    "redaction_required": true,
+    "human_review_required_for_roles": ["planner", "verifier", "reporter"],
+    "metadata": {"mock_only": true}
+  }
+}

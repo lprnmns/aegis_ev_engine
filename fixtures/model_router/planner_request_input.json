@@ -1,0 +1,32 @@
+{
+  "role": "planner",
+  "target": "https://portfolio.example.test",
+  "normalized_target": "https://portfolio.example.test",
+  "scope_summary": {
+    "allowed_domains": ["portfolio.example.test"],
+    "allowed_schemes": ["https"]
+  },
+  "policy_summary": {
+    "safe_mode": true,
+    "allowed_impact_levels": ["green"]
+  },
+  "evidence": [
+    {
+      "evidence_id": "evidence_demo_header_csp",
+      "source_type": "web_header_check",
+      "summary": "Content-Security-Policy was absent in supplied metadata."
+    }
+  ],
+  "findings": [
+    {
+      "finding_id": "finding_demo_missing_csp",
+      "status": "candidate",
+      "verification_state": "evidence_backed",
+      "evidence_ids": ["evidence_demo_header_csp"]
+    }
+  ],
+  "metadata": {
+    "fixture": true,
+    "no_live_model_call": true
+  }
+}

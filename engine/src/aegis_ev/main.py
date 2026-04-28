@@ -54,6 +54,11 @@ MACHINE_COMMANDS = (
     "validate-ai-verifier-output",
     "build-ai-reporter-packet",
     "validate-ai-reporter-output",
+    "list-model-providers",
+    "build-model-request-envelope",
+    "route-model-request",
+    "execute-mock-model-request",
+    "validate-model-response-envelope",
 )
 
 

@@ -1,0 +1,22 @@
+{
+  "output_id": "mock_planner_output_unsafe",
+  "role": "planner",
+  "recommended_steps": [
+    {
+      "step_type": "external_scanner_execution",
+      "impact_level": "red",
+      "status": "proposed",
+      "required_approval": false,
+      "rationale": "Intentionally invalid fixture for guardrail tests.",
+      "related_evidence_ids": ["evidence_demo_header_csp"]
+    }
+  ],
+  "blocked_steps": [],
+  "approval_required_steps": [],
+  "rationale": ["Unsafe mock fixture."],
+  "assumptions": [],
+  "uncertainties": [],
+  "required_human_inputs": [],
+  "safety_warnings": [],
+  "confidence": "low"
+}
