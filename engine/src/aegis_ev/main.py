@@ -45,6 +45,9 @@ MACHINE_COMMANDS = (
     "plan-tool-action",
     "run-portfolio-demo",
     "run-portfolio-operator-pipeline",
+    "generate-remediation-guidance",
+    "create-retest-plan",
+    "compare-retest-results",
 )
 
 

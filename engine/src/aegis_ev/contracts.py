@@ -58,6 +58,15 @@ from .recon_planner import (
     plan_safe_recon,
     recon_plan_report_section,
 )
+from .remediation import (
+    compare_retest_results,
+    create_retest_plan,
+    evidence_from_remediation_guidance,
+    evidence_from_retest_plan,
+    evidence_from_retest_result,
+    generate_remediation_guidance,
+    remediation_retest_report_section,
+)
 from .tool_adapters import (
     check_tool_availability,
     default_tool_registry,
@@ -239,6 +248,12 @@ def run_contract_command(command: str, payload: dict[str, Any]) -> CommandRespon
             return run_portfolio_demo_command(payload)
         if command == "run-portfolio-operator-pipeline":
             return run_portfolio_operator_pipeline_command(payload)
+        if command == "generate-remediation-guidance":
+            return generate_remediation_guidance_command(payload)
+        if command == "create-retest-plan":
+            return create_retest_plan_command(payload)
+        if command == "compare-retest-results":
+            return compare_retest_results_command(payload)
         return failure(command, "unsupported_command", f"Unsupported command: {command}")
     except (KeyError, TypeError, ValueError) as exc:
         return failure(command, "invalid_request", str(exc))
@@ -897,6 +912,48 @@ def run_portfolio_demo_command(payload: dict[str, Any]) -> CommandResponse:
 def run_portfolio_operator_pipeline_command(payload: dict[str, Any]) -> CommandResponse:
     result = run_portfolio_operator_pipeline_from_payload(payload)
     return success("run-portfolio-operator-pipeline", {"pipeline": result.to_dict()}, warnings=list(result.warnings))
+
+
+def generate_remediation_guidance_command(payload: dict[str, Any]) -> CommandResponse:
+    guidance = generate_remediation_guidance(payload)
+    evidence = evidence_from_remediation_guidance(guidance)
+    return success(
+        "generate-remediation-guidance",
+        {
+            "guidance": guidance.to_dict(),
+            "evidence": evidence.to_dict(),
+            "report_section": remediation_retest_report_section(guidance=[guidance]),
+        },
+        warnings=list(guidance.warnings),
+    )
+
+
+def create_retest_plan_command(payload: dict[str, Any]) -> CommandResponse:
+    plan = create_retest_plan(payload)
+    evidence = evidence_from_retest_plan(plan)
+    return success(
+        "create-retest-plan",
+        {
+            "retest_plan": plan.to_dict(),
+            "evidence": evidence.to_dict(),
+            "report_section": remediation_retest_report_section(plan=plan),
+        },
+        warnings=list(plan.warnings),
+    )
+
+
+def compare_retest_results_command(payload: dict[str, Any]) -> CommandResponse:
+    result = compare_retest_results(payload)
+    evidence = evidence_from_retest_result(result)
+    return success(
+        "compare-retest-results",
+        {
+            "retest_result": result.to_dict(),
+            "evidence": evidence.to_dict(),
+            "report_section": remediation_retest_report_section(result=result),
+        },
+        warnings=list(result.warnings),
+    )
 
 
 def verify_audit(payload: dict[str, Any]) -> CommandResponse:

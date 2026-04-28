@@ -36,6 +36,7 @@ class EvidenceSourceType(str, Enum):
     VULNERABILITY_INTELLIGENCE = "vulnerability_intelligence"
     RECON_PLANNER = "recon_planner"
     TOOL_ADAPTER = "tool_adapter"
+    REMEDIATION_RETEST = "remediation_retest"
     AUDIT = "audit"
     HUMAN = "human"
     AI_VERIFIER = "ai_verifier"
@@ -70,6 +71,10 @@ class RetestStatus(str, Enum):
     NOT_RETESTED = "not_retested"
     PASSED = "passed"
     FAILED = "failed"
+    APPEARS_RESOLVED = "appears_resolved"
+    STILL_PRESENT = "still_present"
+    REGRESSED = "regressed"
+    INCONCLUSIVE = "inconclusive"
     NOT_APPLICABLE = "not_applicable"
 
 

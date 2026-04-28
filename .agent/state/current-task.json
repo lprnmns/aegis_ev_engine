@@ -1,12 +1,12 @@
 {
-  "task_id": "TASK-020-integrated-portfolio-operator-pipeline",
-  "branch": "feat/TASK-020-integrated-portfolio-operator-pipeline",
+  "task_id": "TASK-021-remediation-retest-workflow",
+  "branch": "feat/TASK-021-remediation-retest-workflow",
   "base_branch": "beta",
-  "status": "passed",
+  "status": "local_tests_passed",
   "loop_count": 0,
   "max_loops": 1,
   "last_codex_commit": null,
-  "last_gemini_verdict": "PASS",
-  "next_actor": "done",
+  "last_gemini_verdict": null,
+  "next_actor": "gemini",
   "blocked": false
 }
