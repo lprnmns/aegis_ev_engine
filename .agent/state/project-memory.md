@@ -43,7 +43,7 @@ Aegis EV uses a local-first architecture:
 
 ## Current Task
 
-TASK-023 provider-agnostic model router stub.
+TASK-024 Tauri desktop UI shell.
 
 ## Open Decisions
 
@@ -79,3 +79,4 @@ TASK-023 provider-agnostic model router stub.
 - TASK-021 adds deterministic defensive remediation guidance, green-impact retest planning, supplied before/after header comparison, conservative retest status updates, evidence, audit events, report sections, and CLI/API commands without scanner, crawler, fuzzer, exploit validation, external tool execution, or live retest behavior.
 - TASK-022 adds provider-agnostic AI planner/verifier/reporter contract models, prompt packet builders, response validators, guardrail checks, evidence/audit helpers, fixtures, tests, and CLI/API commands without live model calls, provider APIs, API keys, autonomous tool execution, or unsafe validation behavior.
 - TASK-023 adds provider-agnostic model provider profiles, mock-only routing policy, request/response envelopes, offline mock provider execution, TASK-022 guardrail validation hooks, evidence/audit helpers, fixtures, tests, and CLI/API commands without live provider calls, API keys, account-auth access, network behavior, or autonomous tool execution.
+- TASK-024 adds the first Tauri-compatible desktop UI shell with React/TypeScript mock screens, static UI types, placeholder-only data, Tauri config without sidecar/shell permissions, and lightweight validation without live engine execution, model calls, external tools, or real portfolio URL.
