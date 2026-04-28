@@ -1,12 +1,12 @@
 {
-  "task_id": "TASK-024-tauri-ui-shell",
-  "branch": "feat/TASK-024-tauri-ui-shell",
+  "task_id": "TASK-025-tauri-python-sidecar-bridge-stub",
+  "branch": "feat/TASK-025-tauri-python-sidecar-bridge-stub",
   "base_branch": "beta",
-  "status": "passed",
+  "status": "in_progress",
   "loop_count": 0,
   "max_loops": 1,
   "last_codex_commit": null,
-  "last_gemini_verdict": "PASS",
-  "next_actor": "done",
+  "last_gemini_verdict": null,
+  "next_actor": "codex",
   "blocked": false
 }

@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { StatusChip } from "./components/StatusChip";
 import { SummaryCard } from "./components/SummaryCard";
+import { EngineConnectionPanel } from "./components/EngineConnectionPanel";
 import {
   aiGuardrails,
   approvals,
@@ -130,6 +131,7 @@ function Overview({ totalWarnings }: { totalWarnings: number }) {
           no sidecar, scanner, crawler, external tool, or model provider is called.
         </p>
       </section>
+      <EngineConnectionPanel />
     </>
   );
 }
@@ -335,20 +337,23 @@ function AIGuardrails() {
 
 function Settings() {
   return (
-    <div className="stage-grid">
-      {[
-        ["Model providers", "Disabled future settings; mock provider only."],
-        ["Python sidecar path", "Not configured in this UI shell."],
-        ["Local output directory", "Future setting; no files are read here."],
-        ["Safe-mode budgets", "Read-only placeholder for future policy integration."]
-      ].map(([title, detail]) => (
-        <section className="panel panel--muted" key={title}>
-          <h3>{title}</h3>
-          <p>{detail}</p>
-          <StatusChip label="future-disabled" tone="neutral" />
-        </section>
-      ))}
-    </div>
+    <>
+      <EngineConnectionPanel />
+      <div className="stage-grid">
+        {[
+          ["Model providers", "Disabled future settings; mock provider only."],
+          ["Python sidecar path", "Bridge uses fixed development path resolution; no user path is stored."],
+          ["Local output directory", "Future setting; no files are read here."],
+          ["Safe-mode budgets", "Read-only placeholder for future policy integration."]
+        ].map(([title, detail]) => (
+          <section className="panel panel--muted" key={title}>
+            <h3>{title}</h3>
+            <p>{detail}</p>
+            <StatusChip label="future-disabled" tone="neutral" />
+          </section>
+        ))}
+      </div>
+    </>
   );
 }
 
