@@ -2,11 +2,11 @@
   "task_id": "TASK-025-tauri-python-sidecar-bridge-stub",
   "branch": "feat/TASK-025-tauri-python-sidecar-bridge-stub",
   "base_branch": "beta",
-  "status": "in_progress",
+  "status": "awaiting_qa",
   "loop_count": 0,
   "max_loops": 1,
-  "last_codex_commit": null,
+  "last_codex_commit": "5b76967",
   "last_gemini_verdict": null,
-  "next_actor": "codex",
+  "next_actor": "gemini",
   "blocked": false
 }
