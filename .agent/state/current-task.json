@@ -2,11 +2,11 @@
   "task_id": "TASK-026-ui-driven-local-demo-run",
   "branch": "feat/TASK-026-ui-driven-local-demo-run",
   "base_branch": "beta",
-  "status": "in_progress",
+  "status": "awaiting_qa",
   "loop_count": 0,
   "max_loops": 1,
-  "last_codex_commit": null,
+  "last_codex_commit": "3f8c7df",
   "last_gemini_verdict": null,
-  "next_actor": "codex",
+  "next_actor": "gemini",
   "blocked": false
 }
