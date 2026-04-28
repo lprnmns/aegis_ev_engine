@@ -1,0 +1,10 @@
+{
+  "status_code": 200,
+  "final_url": "https://portfolio.example.test",
+  "headers": {
+    "Content-Type": "text/html; charset=utf-8",
+    "Server": "DemoServer/1.0",
+    "Set-Cookie": "sid=not-a-real-demo-token-1234567890"
+  },
+  "elapsed_ms": 7
+}

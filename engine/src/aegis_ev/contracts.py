@@ -33,6 +33,7 @@ from .http_fetch import (
     fixture_transport,
     safe_http_fetch,
 )
+from .operator_pipeline import run_portfolio_operator_pipeline_from_payload
 from .fingerprinting import (
     TechnologyFingerprintInput,
     evidence_from_fingerprint,
@@ -236,6 +237,8 @@ def run_contract_command(command: str, payload: dict[str, Any]) -> CommandRespon
             return plan_tool_action_command(payload)
         if command == "run-portfolio-demo":
             return run_portfolio_demo_command(payload)
+        if command == "run-portfolio-operator-pipeline":
+            return run_portfolio_operator_pipeline_command(payload)
         return failure(command, "unsupported_command", f"Unsupported command: {command}")
     except (KeyError, TypeError, ValueError) as exc:
         return failure(command, "invalid_request", str(exc))
@@ -889,6 +892,11 @@ def run_demo_flow_command(payload: dict[str, Any], *, command: str = "run-demo-f
 def run_portfolio_demo_command(payload: dict[str, Any]) -> CommandResponse:
     result = run_portfolio_demo_from_payload(payload)
     return success("run-portfolio-demo", {"demo": result.to_dict()}, warnings=list(result.warnings))
+
+
+def run_portfolio_operator_pipeline_command(payload: dict[str, Any]) -> CommandResponse:
+    result = run_portfolio_operator_pipeline_from_payload(payload)
+    return success("run-portfolio-operator-pipeline", {"pipeline": result.to_dict()}, warnings=list(result.warnings))
 
 
 def verify_audit(payload: dict[str, Any]) -> CommandResponse:

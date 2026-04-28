@@ -44,6 +44,7 @@ MACHINE_COMMANDS = (
     "check-tool-availability",
     "plan-tool-action",
     "run-portfolio-demo",
+    "run-portfolio-operator-pipeline",
 )
 
 
