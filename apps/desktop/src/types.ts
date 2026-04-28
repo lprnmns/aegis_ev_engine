@@ -6,8 +6,8 @@ export interface ProjectSummary {
   environment: "development" | "staging" | "production";
   safeMode: boolean;
   authorization: "owner-attested" | "missing" | "expired";
-  liveRequestMode: "mock" | "disabled";
-  pipelineStatus: "ready" | "mock-complete" | "disabled";
+  liveRequestMode: "mock" | "disabled" | "local-demo";
+  pipelineStatus: "ready" | "mock-complete" | "completed" | "disabled";
   evidenceCount: number;
   findingCount: number;
   auditStatus: "valid" | "not-run";
@@ -25,10 +25,40 @@ export interface TargetScopeSummary {
 export interface PipelineStage {
   id: string;
   name: string;
-  status: "mocked" | "ready" | "blocked" | "disabled";
+  status: "mocked" | "ready" | "completed" | "warning" | "blocked" | "disabled";
   evidenceCount: number;
   warnings: string[];
   safetyNote: string;
+}
+
+export interface ReportSummary {
+  title: string;
+  format: "markdown" | "json" | "jsonl" | string;
+  status: string;
+  path?: string | null;
+  summary: string;
+}
+
+export interface LocalDemoRunSummary {
+  project: ProjectSummary;
+  targetScope: TargetScopeSummary;
+  pipelineStages: PipelineStage[];
+  findings: FindingSummary[];
+  evidenceRows: EvidenceSummary[];
+  reports: ReportSummary[];
+  auditStatus: string;
+  warnings: string[];
+  errors: string[];
+  safetyFlags: {
+    executedLiveNetwork: false;
+    executedExternalTool: false;
+    executedScanner: false;
+    executedCrawler: false;
+    executedFuzzer: false;
+    calledModelProvider: false;
+    requiredProviderCredential: false;
+    storedRawBody: false;
+  };
 }
 
 export interface FindingSummary {

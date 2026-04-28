@@ -91,7 +91,7 @@ Each button calls the TypeScript bridge client. Outside a Tauri runtime, the UI 
 
 ## Future Work
 
-Future TASK-026 may safely enable selected live commands only with explicit scope, owner authorization, policy gating, approval boundaries, audit events, and no arbitrary passthrough.
+Future tasks may safely enable selected live commands only with explicit scope, owner authorization, policy gating, approval boundaries, audit events, and no arbitrary passthrough. TASK-026 remains local fixture-only.
 
 Not implemented yet:
 

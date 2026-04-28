@@ -396,6 +396,54 @@ td {
   cursor: not-allowed;
 }
 
+.local-demo-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.primary-action {
+  width: fit-content;
+  min-width: 180px;
+  padding: 11px 14px;
+  border: 1px solid #4e7bb5;
+  border-radius: 8px;
+  background: #244d7a;
+  color: #f4f9ff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary-action:hover:not(:disabled) {
+  background: #2e5f95;
+}
+
+.primary-action:disabled {
+  border-color: #3b4655;
+  background: #222a34;
+  color: #8996a7;
+  cursor: wait;
+}
+
+.demo-result-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.demo-result-strip span {
+  padding: 8px 10px;
+  border: 1px solid #344052;
+  border-radius: 8px;
+  background: #202832;
+  color: #dce5ef;
+  font-size: 12px;
+}
+
+.error-text {
+  margin: 0;
+  color: #ffb4b4;
+}
+
 .bridge-panel {
   margin-top: 18px;
 }

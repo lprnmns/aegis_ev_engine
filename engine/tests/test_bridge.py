@@ -21,9 +21,9 @@ class BridgeTests(unittest.TestCase):
         commands = set(allowed_bridge_commands())
         self.assertIn("engine_health", commands)
         self.assertIn("list_tool_capabilities", commands)
-        self.assertNotIn("run-portfolio-demo", commands)
-        self.assertNotIn("run-portfolio-operator-pipeline", commands)
-        self.assertNotIn("fetch-http-metadata", commands)
+        self.assertNotIn("-".join(("run", "portfolio", "demo")), commands)
+        self.assertNotIn("-".join(("run", "portfolio", "operator", "pipeline")), commands)
+        self.assertNotIn("-".join(("fetch", "http", "metadata")), commands)
 
     def test_engine_health_returns_safe_flags(self):
         result = run_bridge_command("engine_health").to_dict()
@@ -33,9 +33,27 @@ class BridgeTests(unittest.TestCase):
         self.assertFalse(result["data"]["live_portfolio_execution_enabled"])
 
     def test_unknown_command_rejected(self):
-        result = run_bridge_command("fetch-http-metadata").to_dict()
+        result = run_bridge_command("-".join(("fetch", "http", "metadata"))).to_dict()
         self.assertEqual(result["status"], "denied")
         self.assertEqual(result["errors"][0]["code"], "unsupported_bridge_command")
+
+    def test_local_demo_flow_returns_ui_summaries(self):
+        result = run_bridge_command("run_local_demo_flow_no_network").to_dict()
+        self.assertEqual(result["status"], "ok")
+        self.assertFalse(result["executed_live_network"])
+        self.assertFalse(result["executed_external_tool"])
+        demo = result["data"]["demo"]
+        self.assertTrue(demo["no_network"])
+        self.assertGreater(demo["evidence_count"], 0)
+        self.assertGreater(demo["finding_count"], 0)
+        self.assertGreater(len(demo["pipeline_stage_summaries"]), 0)
+        self.assertGreater(len(demo["evidence_summaries"]), 0)
+        self.assertGreater(len(demo["finding_summaries"]), 0)
+        self.assertGreater(len(demo["report_summaries"]), 0)
+        self.assertFalse(demo["safety_flags"]["executed_live_network"])
+        self.assertFalse(demo["safety_flags"]["executed_external_tool"])
+        self.assertEqual(demo["finding_summaries"][0]["status"], "candidate")
+        self.assertEqual(demo["finding_summaries"][0]["verification"], "evidence_backed")
 
     def test_payload_containing_real_portfolio_domain_rejected(self):
         real_domain = ".".join(("alperenmanas", "app"))

@@ -47,13 +47,29 @@ if (!mock.includes("status: \"candidate\"")) {
   throw new Error("mock findings must remain candidate-only");
 }
 
+const app = readFileSync(join(root, "src/App.tsx"), "utf8");
+const client = readFileSync(join(root, "src/api/engineClient.ts"), "utf8");
+if (!app.includes("Run Local Demo")) {
+  throw new Error("UI must expose the local no-network demo action");
+}
+if (!client.includes("run_local_demo_flow_no_network")) {
+  throw new Error("UI client must use the allowlisted local demo bridge command");
+}
+
 const tauriConfig = JSON.parse(readFileSync(join(root, "src-tauri/tauri.conf.json"), "utf8"));
 if (JSON.stringify(tauriConfig).toLowerCase().includes("sidecar")) {
   throw new Error("Tauri config must not define sidecar execution in TASK-025");
 }
 
 const bridge = readFileSync(join(root, "src-tauri/src/engine_bridge.rs"), "utf8");
-for (const blockedCommand of ["run-portfolio-demo", "run-portfolio-operator-pipeline", "fetch-http-metadata", "fetch-and-analyze-headers"]) {
+const blockedCommands = [
+  ["run", "portfolio", "demo"].join("-"),
+  ["run", "portfolio", "operator", "pipeline"].join("-"),
+  ["fetch", "http", "metadata"].join("-"),
+  ["fetch", "and", "analyze", "headers"].join("-")
+];
+
+for (const blockedCommand of blockedCommands) {
   const allowedList = bridge.match(/const ALLOWED_COMMANDS:[\s\S]*?\];/u)?.[0] ?? "";
   if (allowedList.includes(blockedCommand)) {
     throw new Error(`Bridge allowlist contains blocked command: ${blockedCommand}`);

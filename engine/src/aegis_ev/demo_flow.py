@@ -51,6 +51,13 @@ class DemoFlowResult:
     session: dict[str, Any] = field(default_factory=dict)
     evidence_ids: tuple[str, ...] = field(default_factory=tuple)
     finding_ids: tuple[str, ...] = field(default_factory=tuple)
+    project_summary: dict[str, Any] = field(default_factory=dict)
+    target_scope_summary: dict[str, Any] = field(default_factory=dict)
+    pipeline_stage_summaries: tuple[dict[str, Any], ...] = field(default_factory=tuple)
+    evidence_summaries: tuple[dict[str, Any], ...] = field(default_factory=tuple)
+    finding_summaries: tuple[dict[str, Any], ...] = field(default_factory=tuple)
+    report_summaries: tuple[dict[str, Any], ...] = field(default_factory=tuple)
+    safety_flags: dict[str, bool] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return redact_value(
@@ -72,6 +79,13 @@ class DemoFlowResult:
                 "session": self.session,
                 "evidence_ids": list(self.evidence_ids),
                 "finding_ids": list(self.finding_ids),
+                "project_summary": self.project_summary,
+                "target_scope_summary": self.target_scope_summary,
+                "pipeline_stage_summaries": list(self.pipeline_stage_summaries),
+                "evidence_summaries": list(self.evidence_summaries),
+                "finding_summaries": list(self.finding_summaries),
+                "report_summaries": list(self.report_summaries),
+                "safety_flags": self.safety_flags,
             }
         )
 
@@ -264,14 +278,39 @@ def run_demo_flow(
 
     final_project = store.get_project(project.project_id)
     final_session = store.get_session(session.session_id)
+    evidence_records = evidence_store.list_evidence()
+    finding_records = evidence_store.list_findings()
+    report_summaries = (
+        {
+            "title": "Local Demo Markdown Report",
+            "format": "markdown",
+            "status": "generated" if markdown else "not_generated",
+            "path": report_paths.get("markdown"),
+            "summary": "Evidence-backed fixture report; no live target request.",
+        },
+        {
+            "title": "Local Demo JSON Report",
+            "format": "json",
+            "status": "generated" if report_json else "not_generated",
+            "path": report_paths.get("json"),
+            "summary": "Structured fixture report data; no raw bodies or secrets.",
+        },
+        {
+            "title": "Local Demo Audit Chain",
+            "format": "jsonl",
+            "status": "valid" if audit_verification.valid else "invalid",
+            "path": report_paths.get("audit"),
+            "summary": f"{audit_verification.event_count} audit events verified.",
+        },
+    )
     return DemoFlowResult(
         demo_id=DEMO_ID,
         project_id=project.project_id,
         session_id=session.session_id,
         target_count=len(final_project.targets),
         imported_endpoint_count=imported_endpoint_count,
-        evidence_count=len(evidence_store.list_evidence()),
-        finding_count=len(evidence_store.list_findings()),
+        evidence_count=len(evidence_records),
+        finding_count=len(finding_records),
         report_paths=report_paths,
         reports=reports,
         audit_verification_status=_audit_status(audit_verification),
@@ -280,8 +319,69 @@ def run_demo_flow(
         no_network=True,
         project=final_project.to_dict(),
         session=final_session.to_dict(),
-        evidence_ids=tuple(record.evidence_id for record in evidence_store.list_evidence()),
-        finding_ids=tuple(record.finding_id for record in evidence_store.list_findings()),
+        evidence_ids=tuple(record.evidence_id for record in evidence_records),
+        finding_ids=tuple(record.finding_id for record in finding_records),
+        project_summary={
+            "project_name": final_project.name,
+            "target_url": PLACEHOLDER_TARGET,
+            "environment": final_project.environment,
+            "safe_mode": True,
+            "authorization": "placeholder-owner-attested",
+            "pipeline_status": "completed",
+            "evidence_count": len(evidence_records),
+            "finding_count": len(finding_records),
+            "audit_status": "valid" if audit_verification.valid else "invalid",
+        },
+        target_scope_summary={
+            "allowed_domains": list(final_project.scope.allowlist_domains if final_project.scope else ()),
+            "allowed_schemes": list(final_project.scope.allowed_schemes if final_project.scope else ()),
+            "environment": final_project.environment,
+            "authorization_attestation": "Placeholder owner-attestation model; no live request was made.",
+            "target_count": len(final_project.targets),
+        },
+        pipeline_stage_summaries=(
+            {"id": "project_scope_created", "name": "Project and scope created", "status": "completed", "evidence_count": 0, "warnings": []},
+            {"id": "imports_processed", "name": "Fixture imports processed", "status": "completed", "evidence_count": 3, "warnings": warnings},
+            {"id": "header_checks", "name": "Supplied header checks", "status": "completed", "evidence_count": len([item for item in evidence_records if str(item.source_type.value if hasattr(item.source_type, "value") else item.source_type) == "web_header_check"]), "warnings": []},
+            {"id": "evidence_generated", "name": "Evidence generated", "status": "completed", "evidence_count": len(evidence_records), "warnings": []},
+            {"id": "findings_generated", "name": "Candidate findings generated", "status": "completed", "evidence_count": len(finding_records), "warnings": ["Findings are candidate observations only."]},
+            {"id": "report_generated", "name": "Markdown and JSON report generated", "status": "completed", "evidence_count": len(evidence_records), "warnings": []},
+            {"id": "audit_verified", "name": "Audit chain verified", "status": "completed" if audit_verification.valid else "warning", "evidence_count": audit_verification.event_count, "warnings": list(audit_verification.errors)},
+        ),
+        evidence_summaries=tuple(
+            {
+                "id": record.evidence_id,
+                "source_type": str(record.source_type.value if hasattr(record.source_type, "value") else record.source_type),
+                "title": record.title,
+                "summary": record.summary,
+                "redaction_applied": True,
+                "body_stored": False,
+            }
+            for record in evidence_records
+        ),
+        finding_summaries=tuple(
+            {
+                "id": record.finding_id,
+                "title": record.title,
+                "severity": str(record.severity.value if hasattr(record.severity, "value") else record.severity),
+                "status": str(record.status.value if hasattr(record.status, "value") else record.status),
+                "verification": str(record.verification_state.value if hasattr(record.verification_state, "value") else record.verification_state),
+                "retest_status": str(record.retest_status.value if hasattr(record.retest_status, "value") else record.retest_status),
+                "evidence_ids": list(record.evidence_ids),
+            }
+            for record in finding_records
+        ),
+        report_summaries=report_summaries,
+        safety_flags={
+            "executed_live_network": False,
+            "executed_external_tool": False,
+            "executed_scanner": False,
+            "executed_crawler": False,
+            "executed_fuzzer": False,
+            "called_model_provider": False,
+            "required_provider_credential": False,
+            "stored_raw_body": False,
+        },
     )
 
 
