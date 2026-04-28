@@ -1,0 +1,60 @@
+{
+  "providers": [
+    {
+      "provider_id": "mock_safe_provider",
+      "display_name": "Offline Mock Provider",
+      "provider_type": "mock",
+      "auth_mode": "mock",
+      "supported_roles": ["planner", "verifier", "reporter"],
+      "supported_capabilities": ["json_output", "guardrail_validation", "offline_fixture_response"],
+      "default_model_alias": "mock-safe-v1",
+      "max_context_tokens": 16000,
+      "supports_structured_output": true,
+      "supports_tool_calling": false,
+      "supports_streaming": false,
+      "supports_local_only": true,
+      "requires_network": false,
+      "requires_api_key": false,
+      "requires_account_auth": false,
+      "enabled": true,
+      "safe_for_local_tests": true,
+      "metadata": {"runtime_execution": "mock_only"}
+    },
+    {
+      "provider_id": "future_account_cli_provider",
+      "display_name": "Future Account CLI Provider",
+      "provider_type": "account_cli",
+      "auth_mode": "account_auth",
+      "supported_roles": ["planner", "verifier", "reporter"],
+      "supported_capabilities": ["json_output"],
+      "supports_structured_output": true,
+      "supports_tool_calling": false,
+      "supports_streaming": false,
+      "supports_local_only": false,
+      "requires_network": true,
+      "requires_api_key": false,
+      "requires_account_auth": true,
+      "enabled": false,
+      "safe_for_local_tests": false,
+      "metadata": {"future_profile": true, "runtime_execution": "disabled"}
+    },
+    {
+      "provider_id": "future_api_provider",
+      "display_name": "Future BYOK API Provider",
+      "provider_type": "api",
+      "auth_mode": "api_key",
+      "supported_roles": ["planner", "verifier", "reporter"],
+      "supported_capabilities": ["json_output"],
+      "supports_structured_output": true,
+      "supports_tool_calling": false,
+      "supports_streaming": false,
+      "supports_local_only": false,
+      "requires_network": true,
+      "requires_api_key": true,
+      "requires_account_auth": false,
+      "enabled": false,
+      "safe_for_local_tests": false,
+      "metadata": {"future_profile": true, "runtime_execution": "disabled"}
+    }
+  ]
+}

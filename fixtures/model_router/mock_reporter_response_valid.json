@@ -1,0 +1,17 @@
+{
+  "output_id": "mock_reporter_output_valid",
+  "role": "reporter",
+  "executive_summary": "Supplied metadata supports candidate defensive configuration observations.",
+  "technical_summary": "Observations are evidence-backed, not confirmed exploitability.",
+  "finding_narratives": [
+    {
+      "finding_id": "finding_demo_missing_csp",
+      "status": "candidate",
+      "evidence_ids": ["evidence_demo_header_csp"]
+    }
+  ],
+  "remediation_summary": "Apply defensive headers through the owner-controlled deployment workflow.",
+  "retest_summary": "Retest with safe metadata/header comparison after changes.",
+  "limitations": ["No live model, crawler, scanner, fuzzer, or external tool execution occurred."],
+  "confidence": "medium"
+}

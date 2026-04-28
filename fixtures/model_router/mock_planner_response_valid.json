@@ -1,0 +1,22 @@
+{
+  "output_id": "mock_planner_output_valid",
+  "role": "planner",
+  "recommended_steps": [
+    {
+      "step_type": "review_evidence",
+      "impact_level": "green",
+      "status": "proposed",
+      "required_approval": false,
+      "rationale": "Review supplied evidence before planning broader validation.",
+      "related_evidence_ids": ["evidence_demo_header_csp"]
+    }
+  ],
+  "blocked_steps": [],
+  "approval_required_steps": [],
+  "rationale": ["Mock output is limited to safe evidence review."],
+  "assumptions": [],
+  "uncertainties": ["No live model or tool execution occurred."],
+  "required_human_inputs": [],
+  "safety_warnings": ["Use deterministic guardrail validation before trusting output."],
+  "confidence": "medium"
+}
