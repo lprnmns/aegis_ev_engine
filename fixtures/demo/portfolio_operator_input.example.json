@@ -1,0 +1,21 @@
+{
+  "project_name": "Aegis EV Portfolio Operator Pipeline",
+  "target_url": "https://portfolio.example.test",
+  "owner_authorization_attestation": true,
+  "owner_name": "Portfolio Owner",
+  "environment": "staging",
+  "safe_mode": true,
+  "allowed_domain": "portfolio.example.test",
+  "allowed_schemes": ["https"],
+  "max_redirects": 3,
+  "timeout_seconds": 5,
+  "output_dir": "output/portfolio-demo",
+  "tags": ["portfolio-operator-pipeline", "authorized-owner-demo"],
+  "metadata": {
+    "note": "Replace this placeholder URL only in local/portfolio-demo-input.json. Do not commit real target details.",
+    "no_crawling": true,
+    "no_fuzzing": true,
+    "no_external_tools": true,
+    "no_body_storage": true
+  }
+}
