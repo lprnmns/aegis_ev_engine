@@ -48,6 +48,12 @@ MACHINE_COMMANDS = (
     "generate-remediation-guidance",
     "create-retest-plan",
     "compare-retest-results",
+    "build-ai-planner-packet",
+    "validate-ai-planner-output",
+    "build-ai-verifier-packet",
+    "validate-ai-verifier-output",
+    "build-ai-reporter-packet",
+    "validate-ai-reporter-output",
 )
 
 

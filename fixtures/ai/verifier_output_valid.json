@@ -1,0 +1,26 @@
+{
+  "output_id": "verifier_output_demo_valid",
+  "role": "verifier",
+  "reviewed_findings": [
+    {
+      "finding_id": "finding_demo_missing_csp",
+      "status": "candidate",
+      "verification_state": "evidence_backed",
+      "evidence_ids": ["evidence_demo_header_csp"],
+      "assessment": "Evidence supports a candidate header observation, not confirmed exploitability."
+    }
+  ],
+  "accepted_evidence_ids": ["evidence_demo_header_csp"],
+  "rejected_claims": [],
+  "false_positive_risks": ["Header behavior can vary by route and environment."],
+  "verification_gaps": ["No authorized retest has been supplied after remediation."],
+  "recommended_retests": [
+    {
+      "step_type": "retest_after_fix",
+      "impact_level": "green",
+      "evidence_ids": ["evidence_demo_header_csp"]
+    }
+  ],
+  "human_review_required": true,
+  "confidence": "medium"
+}

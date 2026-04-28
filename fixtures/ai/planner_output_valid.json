@@ -1,0 +1,25 @@
+{
+  "output_id": "planner_output_demo_valid",
+  "role": "planner",
+  "recommended_steps": [
+    {
+      "step_type": "review_evidence",
+      "impact_level": "green",
+      "status": "proposed",
+      "required_approval": false,
+      "rationale": "Review the evidence-backed missing header observation before planning any broader work.",
+      "related_evidence_ids": ["evidence_demo_header_csp"]
+    }
+  ],
+  "blocked_steps": [],
+  "approval_required_steps": [],
+  "rationale": ["Only supplied evidence and safe built-in capabilities are used."],
+  "assumptions": ["The target remains within the supplied authorization scope."],
+  "uncertainties": ["No active validation has been performed."],
+  "required_human_inputs": [],
+  "safety_warnings": ["Do not execute tools from this contract output."],
+  "confidence": "medium",
+  "metadata": {
+    "model_call": false
+  }
+}

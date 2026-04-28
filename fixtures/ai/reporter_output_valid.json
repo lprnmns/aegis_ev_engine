@@ -1,0 +1,18 @@
+{
+  "output_id": "reporter_output_demo_valid",
+  "role": "reporter",
+  "executive_summary": "A supplied metadata review identified candidate defensive configuration observations.",
+  "technical_summary": "The missing header observation is evidence-backed and should be reviewed before broader validation.",
+  "finding_narratives": [
+    {
+      "finding_id": "finding_demo_missing_csp",
+      "status": "candidate",
+      "evidence_ids": ["evidence_demo_header_csp"],
+      "narrative": "Content-Security-Policy was absent in supplied response metadata."
+    }
+  ],
+  "remediation_summary": "Apply defensive response headers through the owner-controlled deployment process.",
+  "retest_summary": "After remediation, compare safe before/after header metadata.",
+  "limitations": ["No crawler, scanner, fuzzer, external tool execution, or intrusive validation was performed."],
+  "confidence": "medium"
+}
