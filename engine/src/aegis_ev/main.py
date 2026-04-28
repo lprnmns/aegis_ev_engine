@@ -40,6 +40,9 @@ MACHINE_COMMANDS = (
     "build-attack-surface-graph",
     "map-vulnerability-intelligence",
     "plan-safe-recon",
+    "list-tool-capabilities",
+    "check-tool-availability",
+    "plan-tool-action",
     "run-portfolio-demo",
 )
 

@@ -43,7 +43,7 @@ Aegis EV uses a local-first architecture:
 
 ## Current Task
 
-TASK-018 safe recon planner.
+TASK-019 green-tier tool adapter pack.
 
 ## Open Decisions
 
@@ -74,3 +74,4 @@ TASK-018 safe recon planner.
 - TASK-016 adds a deterministic attack surface graph that connects projects, targets, endpoints, technologies, controls, evidence, candidate findings, and risk hypotheses from supplied safe data without network, crawling, scanners, or confirmed vulnerability claims.
 - TASK-017 adds offline-first vulnerability intelligence mapping from supplied attack surface and fingerprint signals to local OWASP/CWE/CVE-style/KEV-style/EPSS-style knowledge records, producing conservative knowledge matches and evidence without live feed ingestion, network access, intrusive validation, or confirmed vulnerability claims.
 - TASK-018 adds a deterministic safe recon planner that converts supplied graph, fingerprint, vulnerability intelligence, evidence, and finding context into policy-aware planning recommendations without executing tools, crawling, fuzzing, scanners, live feed lookups, or active validation.
+- TASK-019 adds green-tier tool capability metadata, dry-run argv-list planning, safe availability checks, parser contracts, and evidence/audit/recon-planner integration without executing external tools, scanners, crawlers, fuzzers, or live network behavior.

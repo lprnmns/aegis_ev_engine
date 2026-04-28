@@ -35,6 +35,7 @@ class EvidenceSourceType(str, Enum):
     ATTACK_SURFACE_GRAPH = "attack_surface_graph"
     VULNERABILITY_INTELLIGENCE = "vulnerability_intelligence"
     RECON_PLANNER = "recon_planner"
+    TOOL_ADAPTER = "tool_adapter"
     AUDIT = "audit"
     HUMAN = "human"
     AI_VERIFIER = "ai_verifier"

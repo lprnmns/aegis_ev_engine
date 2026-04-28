@@ -10,6 +10,7 @@ from .audit import AuditEvent, AuditLog, GENESIS_HASH, canonical_json, redact_ta
 from .evidence import EvidenceRecord, EvidenceSourceType, EvidenceType, FindingConfidence
 from .models import AuthorizationProfile, ImpactLevel, RequestBudget, ToolIntent
 from .policy import PolicyEngine
+from .tool_adapters import RECON_STEP_TOOL_CAPABILITIES
 
 
 PLANNER_MODES = {"conservative", "expanded", "standard"}
@@ -396,6 +397,13 @@ def _build_step(
             "auto_approved": False,
         }
     step_id = _stable_id("recon_step", step_type, impact, target, adapter_id, adapter_action, proposal.get("rationale"), tuple(related_nodes), tuple(related_matches))
+    tool_capability_id = RECON_STEP_TOOL_CAPABILITIES.get(step_type)
+    metadata = {
+        "approval_request": approval_shape,
+        "tool_execution": False,
+        "tool_capability_id": tool_capability_id,
+        "tool_capability_available": bool(tool_capability_id),
+    }
     return ReconStep(
         step_id=step_id,
         title=proposal["title"],
@@ -419,7 +427,7 @@ def _build_step(
         status=status,
         priority=proposal.get("priority", "low"),
         tags=(step_type, "planning-only"),
-        metadata={"approval_request": approval_shape, "tool_execution": False},
+        metadata=metadata,
     )
 
 

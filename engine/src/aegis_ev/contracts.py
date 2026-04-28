@@ -57,6 +57,13 @@ from .recon_planner import (
     plan_safe_recon,
     recon_plan_report_section,
 )
+from .tool_adapters import (
+    check_tool_availability,
+    default_tool_registry,
+    evidence_from_tool_availability,
+    evidence_from_tool_plan,
+    plan_tool_action,
+)
 from .vuln_intel import (
     evidence_from_vulnerability_mapping,
     findings_from_vulnerability_mapping,
@@ -221,6 +228,12 @@ def run_contract_command(command: str, payload: dict[str, Any]) -> CommandRespon
             return map_vulnerability_intelligence_command(payload)
         if command == "plan-safe-recon":
             return plan_safe_recon_command(payload)
+        if command == "list-tool-capabilities":
+            return list_tool_capabilities_command(payload)
+        if command == "check-tool-availability":
+            return check_tool_availability_command(payload)
+        if command == "plan-tool-action":
+            return plan_tool_action_command(payload)
         if command == "run-portfolio-demo":
             return run_portfolio_demo_command(payload)
         return failure(command, "unsupported_command", f"Unsupported command: {command}")
@@ -601,6 +614,45 @@ def plan_safe_recon_command(payload: dict[str, Any]) -> CommandResponse:
         },
         warnings=list(plan.warnings),
     )
+
+
+def list_tool_capabilities_command(payload: dict[str, Any]) -> CommandResponse:
+    command = "list-tool-capabilities"
+    registry = default_tool_registry()
+    tier = payload.get("tier")
+    category = payload.get("category")
+    if tier:
+        if str(tier) != "green":
+            return failure(command, "unsupported_tier", "TASK-019 exposes green-tier capabilities only")
+        tools = registry.list_green_tools()
+    elif category:
+        tools = registry.list_by_category(str(category))
+    else:
+        tools = registry.list_tools()
+    return success(
+        command,
+        {
+            "tool_count": len(tools),
+            "tools": [tool.to_dict() for tool in tools],
+            "execution_policy": "metadata_and_dry_run_only",
+        },
+    )
+
+
+def check_tool_availability_command(payload: dict[str, Any]) -> CommandResponse:
+    command = "check-tool-availability"
+    availability = check_tool_availability(str(_required(payload, "tool_id")), now=_optional_datetime(payload.get("now")))
+    evidence = evidence_from_tool_availability(availability)
+    return success(command, {"availability": availability.to_dict(), "evidence": evidence.to_dict()})
+
+
+def plan_tool_action_command(payload: dict[str, Any]) -> CommandResponse:
+    command = "plan-tool-action"
+    authorization = _authorization_profile(payload["authorization_profile"]) if payload.get("authorization_profile") else None
+    plan = plan_tool_action(payload, authorization_profile=authorization, now=_optional_datetime(payload.get("now")))
+    evidence = evidence_from_tool_plan(plan)
+    response = {"plan": plan.to_dict(), "evidence": evidence.to_dict()}
+    return success(command, response, warnings=list(plan.warnings))
 
 
 def _fetch_http(payload: dict[str, Any], *, analyze: bool) -> CommandResponse:

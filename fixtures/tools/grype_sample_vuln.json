@@ -1,0 +1,15 @@
+{
+  "matches": [
+    {
+      "vulnerability": {
+        "id": "CVE-SAMPLE-0001",
+        "severity": "medium",
+        "description": "Safe fixture knowledge match without reproduction details."
+      },
+      "artifact": {
+        "name": "example-web-package",
+        "version": "1.2.3"
+      }
+    }
+  ]
+}
