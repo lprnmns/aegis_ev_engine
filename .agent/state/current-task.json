@@ -1,12 +1,12 @@
 {
-  "task_id": "TASK-023-provider-agnostic-model-router-stub",
-  "branch": "feat/TASK-023-provider-agnostic-model-router-stub",
+  "task_id": "TASK-024-tauri-ui-shell",
+  "branch": "feat/TASK-024-tauri-ui-shell",
   "base_branch": "beta",
-  "status": "passed",
+  "status": "local_tests_passed",
   "loop_count": 0,
   "max_loops": 1,
   "last_codex_commit": null,
-  "last_gemini_verdict": "PASS",
-  "next_actor": "done",
+  "last_gemini_verdict": null,
+  "next_actor": "gemini",
   "blocked": false
 }
