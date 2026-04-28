@@ -1,12 +1,12 @@
 {
-  "task_id": "TASK-017-vuln-intel-mapping",
-  "branch": "feat/TASK-017-vuln-intel-mapping",
+  "task_id": "TASK-018-safe-recon-planner",
+  "branch": "feat/TASK-018-safe-recon-planner",
   "base_branch": "beta",
-  "status": "passed",
+  "status": "local_tests_passed",
   "loop_count": 0,
   "max_loops": 1,
   "last_codex_commit": null,
-  "last_gemini_verdict": "PASS",
-  "next_actor": "done",
+  "last_gemini_verdict": null,
+  "next_actor": "gemini",
   "blocked": false
 }

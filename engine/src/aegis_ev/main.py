@@ -39,6 +39,7 @@ MACHINE_COMMANDS = (
     "fingerprint-technology",
     "build-attack-surface-graph",
     "map-vulnerability-intelligence",
+    "plan-safe-recon",
     "run-portfolio-demo",
 )
 

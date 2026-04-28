@@ -52,6 +52,11 @@ from .projects import (
     validate_target_against_scope,
 )
 from .reporting import create_report, render_report_json, render_report_markdown
+from .recon_planner import (
+    evidence_from_recon_plan,
+    plan_safe_recon,
+    recon_plan_report_section,
+)
 from .vuln_intel import (
     evidence_from_vulnerability_mapping,
     findings_from_vulnerability_mapping,
@@ -214,6 +219,8 @@ def run_contract_command(command: str, payload: dict[str, Any]) -> CommandRespon
             return build_attack_surface_graph_command(payload)
         if command == "map-vulnerability-intelligence":
             return map_vulnerability_intelligence_command(payload)
+        if command == "plan-safe-recon":
+            return plan_safe_recon_command(payload)
         if command == "run-portfolio-demo":
             return run_portfolio_demo_command(payload)
         return failure(command, "unsupported_command", f"Unsupported command: {command}")
@@ -570,6 +577,30 @@ def map_vulnerability_intelligence_command(payload: dict[str, Any]) -> CommandRe
     response["findings"] = [item.to_dict() for item in findings_from_vulnerability_mapping(mapping)]
     response["report_section"] = vulnerability_intelligence_report_section(mapping)
     return success(command, response, warnings=list(mapping.warnings))
+
+
+def plan_safe_recon_command(payload: dict[str, Any]) -> CommandResponse:
+    command = "plan-safe-recon"
+    authorization = _authorization_profile(_required_dict(payload, "authorization_profile"))
+    target = str(_required(payload, "target"))
+    planner_input = dict(_required_dict(payload, "planner_input"))
+    planner_input.setdefault("target", target)
+    plan = plan_safe_recon(
+        planner_input,
+        authorization_profile=authorization,
+        adapter_registry=default_registry(),
+        audit_log=_optional_audit_log(payload),
+    )
+    evidence = evidence_from_recon_plan(plan)
+    return success(
+        command,
+        {
+            "plan": plan.to_dict(),
+            "evidence": evidence.to_dict(),
+            "report_section": recon_plan_report_section(plan),
+        },
+        warnings=list(plan.warnings),
+    )
 
 
 def _fetch_http(payload: dict[str, Any], *, analyze: bool) -> CommandResponse:

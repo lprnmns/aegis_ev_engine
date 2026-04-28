@@ -34,6 +34,7 @@ class EvidenceSourceType(str, Enum):
     TECHNOLOGY_FINGERPRINT = "technology_fingerprint"
     ATTACK_SURFACE_GRAPH = "attack_surface_graph"
     VULNERABILITY_INTELLIGENCE = "vulnerability_intelligence"
+    RECON_PLANNER = "recon_planner"
     AUDIT = "audit"
     HUMAN = "human"
     AI_VERIFIER = "ai_verifier"
