@@ -10,8 +10,10 @@ const files = [
   "src-tauri/src/main.rs"
 ];
 
+const realPortfolioDomain = ["alperenmanas", "app"].join(".");
+
 const forbidden = [
-  "alperenmanas.app",
+  realPortfolioDomain,
   "OPENAI_API_KEY",
   "GEMINI_API_KEY",
   "NVIDIA_API_KEY",
